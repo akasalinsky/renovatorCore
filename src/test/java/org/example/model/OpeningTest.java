@@ -33,7 +33,7 @@ public class OpeningTest {
         // When / Then
         assertThatThrownBy(() -> new Opening(type, invalidWidth, height))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Width must be positive");
+                .hasMessage("Openings area cannot be negative");
     }
 
     @Test
@@ -41,12 +41,12 @@ public class OpeningTest {
         // Given
         OpeningType type = OpeningType.WINDOW;
         double width = 1.5;
-        double invalidHeight = 0.0; // or -1.0
+        double invalidHeight = -1.0;
 
         // When / Then
         assertThatThrownBy(() -> new Opening(type, width, invalidHeight))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Height must be positive");
+                .hasMessage("Openings area cannot be negative");
     }
 
     @Test

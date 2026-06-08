@@ -32,7 +32,7 @@
 
 1. Клонируйте репозиторий:
    ```bash
-   git clone <url-твоего-репозитория>
+   git clone https://github.com/akasalinsky/renovatorCore
    cd room-planner
    
 2. Соберите проект и запустите тесты:
@@ -40,8 +40,7 @@
 bash
 # Maven
 ./mvnw test
-# или Gradle
-./gradlew test
+
 Чтобы увидеть работу модели «глазами», запустите класс Main (если есть) или выполните:
 
 bash

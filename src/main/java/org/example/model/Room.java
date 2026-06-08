@@ -10,37 +10,25 @@ public class Room {
     private double length;
     private double width;
     private double height;
-    private double openingsArea;
+    //private double openingsArea;
     private final double STANDARTROOLWIDTH = 1.06;
     private final double STANDARTROOLLENGTH = 10.0;
     private final double STANDARTPLANKWIDTH = 0.16;
     private final double STANDARTPLANKLENGTH = 1.286;
     private List<Opening> openings = new ArrayList<>();
 
+    public double getOpeningsArea(){
+        double openeingsArea = 0.0;
+        for(Opening opening: openings){
+            openeingsArea += opening.area();
+        }
+        return openeingsArea;
+    }
+
+
     public Room(String name, double length, double width, double height, double openingsArea) {
-        if (length <= 0) {
-            throw new IllegalArgumentException("Length must be positive");
-        }
-        if (width <= 0) {
-            throw new IllegalArgumentException("Width must be positive");
-        }
-        if (height <= 0) {
-            throw new IllegalArgumentException("Height must be positive");
-        }
-        if (openingsArea < 0) {
-            throw new IllegalArgumentException("Openings area cannot be negative");
-        }
-
-        double totalWallArea = 2 * (length + width) * height;
-        if (openingsArea > totalWallArea) {
-            throw new IllegalArgumentException("Openings area cannot exceed total wall area");
-        }
-
-        this.name = name;
-        this.length = length;
-        this.width = width;
-        this.height = height;
-        this.openingsArea = openingsArea;
+        this(name, length, width, height,
+                List.of(new Opening(OpeningType.TOTAL_AREA, openingsArea, 1.0)));
     }
 
     public Room(String name, double length, double width, double height, List<Opening> openings) {
@@ -95,11 +83,6 @@ public class Room {
         return height;
     }
 
-    public double getOpeningsArea() {
-        return openingsArea;
-    }
-
-
     public double getVolume() {
         return length * width * height;
     }
@@ -109,12 +92,12 @@ public class Room {
     }
 
     public double getNetWallArea() {
-        return 2 * (length + width) * height - openingsArea;
+        return 2 * (length + width) * height - getOpeningsArea();
     }
 
     public Room withOpeningsArea(double v) {
         double totalWallArea = 2 * (length + width) * height;
-        if (openingsArea > totalWallArea) {
+        if (getOpeningsArea() > totalWallArea) {
             throw new IllegalArgumentException("Openings area cannot exceed total wall area");
         }
 
@@ -122,8 +105,8 @@ public class Room {
     }
 
     public String describe() {
-        return String.format(Locale.US,"Room %.1fx%.1fx%.1f, openings: %.1f m²",
-                length, width, height, openingsArea);
+        return String.format(Locale.US,"Room %.1fx%.1fx%.1f, openings: %.2f m²",
+                length, width, height, getOpeningsArea());
     }
 
     public int getWallpaperRolls(double rollWidth, double rollLength) {

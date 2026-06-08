@@ -1,6 +1,6 @@
 package org.example.model;
 
 public enum OpeningType {
-    DOOR, WINDOW
+    DOOR, WINDOW, TOTAL_AREA
 
 }

@@ -10,11 +10,8 @@ public class Opening {
 
 
     public Opening(OpeningType type, double width, double height) {
-        if (width <= 0) {
-            throw new IllegalArgumentException("Width must be positive");
-        }
-        if (height <= 0) {
-            throw new IllegalArgumentException("Height must be positive");
+        if (width < 0 || height < 0) {
+            throw new IllegalArgumentException("Openings area cannot be negative");
         }
 
         this.type = type;
