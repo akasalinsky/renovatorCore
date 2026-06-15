@@ -7,18 +7,18 @@ import java.util.Locale;
 
 public class Room {
     private String name;
-    private double length;
-    private double width;
-    private double height;
-    //private double openingsArea;
-    private final double STANDARTROOLWIDTH = 1.06;
-    private final double STANDARTROOLLENGTH = 10.0;
-    private final double STANDARTPLANKWIDTH = 0.16;
-    private final double STANDARTPLANKLENGTH = 1.286;
+    private int length;
+    private int width;
+    private int height;
+    //private int openingsArea;
+    private final int STANDARTROOLWIDTH = 1060;
+    private final int STANDARTROOLLENGTH = 10000;
+    private final int STANDARTPLANKWIDTH = 160;
+    private final int STANDARTPLANKLENGTH = 1286;
     private List<Opening> openings = new ArrayList<>();
 
-    public double getOpeningsArea(){
-        double openeingsArea = 0.0;
+    public int getOpeningsArea(){
+        int openeingsArea = 0;
         for(Opening opening: openings){
             openeingsArea += opening.area();
         }
@@ -26,12 +26,12 @@ public class Room {
     }
 
 
-    public Room(String name, double length, double width, double height, double openingsArea) {
+    public Room(String name, int length, int width, int height, int openingsArea) {
         this(name, length, width, height,
-                List.of(new Opening(OpeningType.TOTAL_AREA, openingsArea, 1.0)));
+                List.of(new Opening(OpeningType.TOTAL_AREA, openingsArea, 1)));
     }
 
-    public Room(String name, double length, double width, double height, List<Opening> openings) {
+    public Room(String name, int length, int width, int height, List<Opening> openings) {
         if (openings == null) {
             openings = new ArrayList<>();
         }
@@ -45,8 +45,8 @@ public class Room {
             throw new IllegalArgumentException("Height must be positive");
         }
 
-        double totalWallArea = 2 * (length + width) * height;
-        double openingsArea = 0;
+        int totalWallArea = 2 * (length + width) * height;
+        int openingsArea = 0;
 
         for (Opening opening : openings) {
             openingsArea += opening.area();
@@ -63,7 +63,7 @@ public class Room {
         this.openings = openings;
     }
 
-    public double getFloorArea() {
+    public int getFloorArea() {
         return length * width;
     }
 
@@ -71,32 +71,32 @@ public class Room {
         return name;
     }
 
-    public double getLength() {
+    public int getLength() {
         return length;
     }
 
-    public double getWidth() {
+    public int getWidth() {
         return width;
     }
 
-    public double getHeight() {
+    public int getHeight() {
         return height;
     }
 
-    public double getVolume() {
+    public int getVolume() {
         return length * width * height;
     }
 
-    public double getTotalWallArea() {
+    public int getTotalWallArea() {
         return 2 * (length + width) * height;
     }
 
-    public double getNetWallArea() {
+    public int getNetWallArea() {
         return 2 * (length + width) * height - getOpeningsArea();
     }
 
-    public Room withOpeningsArea(double v) {
-        double totalWallArea = 2 * (length + width) * height;
+    public Room withOpeningsArea(int v) {
+        int totalWallArea = 2 * (length + width) * height;
         if (getOpeningsArea() > totalWallArea) {
             throw new IllegalArgumentException("Openings area cannot exceed total wall area");
         }
@@ -105,39 +105,46 @@ public class Room {
     }
 
     public String describe() {
-        return String.format(Locale.US,"Room %.1fx%.1fx%.1f, openings: %.2f m²",
+        return String.format(Locale.US,"Room %1d%2d%3d, openings: %4dm²",
                 length, width, height, getOpeningsArea());
     }
 
-    public int getWallpaperRolls(double rollWidth, double rollLength) {
+    public int getWallpaperRolls(int rollWidth, int rollLength) {
         if (rollWidth <= 0 || rollLength <= 0) {
             throw new IllegalArgumentException("Roll dimensions must be positive");
         }
-        double rollArea = rollWidth * rollLength;
-        return (int) Math.ceil(getNetWallArea() / rollArea);
+        int rollArea = rollWidth * rollLength;
+        return getNetWallArea() / rollArea;
     }
 
     public int getWallpaperRolls() {
-        double rollArea = STANDARTROOLWIDTH * STANDARTROOLLENGTH;
-        return (int) Math.ceil(getNetWallArea() / rollArea);
+        int rollArea = STANDARTROOLWIDTH * STANDARTROOLLENGTH;
+        return getNetWallArea() / rollArea;
     }
 
-    public int getlaminatePlank(double plankWidth, double plankLength) {
+    public int getlaminatePlank(int plankWidth, int plankLength) {
         if (plankWidth <= 0 || plankLength <= 0) {
             throw new IllegalArgumentException("Plank dimensions must be positive");
         }
-        double plankArea = plankWidth * plankLength;
-        return (int) Math.ceil(getFloorArea() / plankArea);
+
+        int plankArea = plankWidth * plankLength;
+        int floorArea = getFloorArea();
+
+        return (floorArea + plankArea - 1) / plankArea;
+
+
     }
 
     public int getlaminatePlank() {
-        double plankArea = STANDARTPLANKWIDTH * STANDARTPLANKLENGTH;
-        return (int) Math.ceil(getFloorArea() / plankArea);
+        int plankArea = STANDARTPLANKWIDTH * STANDARTPLANKLENGTH;
+        int floorArea = getFloorArea();
+
+        return (floorArea + plankArea - 1) / plankArea;
     }
 
-    public double getLinomeumRollLength(double rollWidth) {
-        double max = Math.max(width, length);
-        double min = Math.min(width, length);
+    public int getLinomeumRollLength(int rollWidth) {
+        int max = Math.max(width, length);
+        int min = Math.min(width, length);
 
         if (rollWidth <= 0) {
             throw new IllegalArgumentException("Rool dimensions must be positive");
@@ -154,5 +161,37 @@ public class Room {
 
     public List<Opening> getOpenings() {
         return Collections.unmodifiableList(this.openings);
+    }
+
+    public String renderPlan() {
+        int width = this.width/1000;
+        int length = this.length/1000;
+
+        StringBuilder sb = new StringBuilder();
+
+        // Верхняя граница
+        sb.append("+");
+        for (int i = 0; i < width; i++) {
+            sb.append("-");
+        }
+        sb.append("+\n");
+
+        // Боковые границы и внутреннее пространство
+        for (int i = 0; i < length; i++) {
+            sb.append("|");
+            for (int j = 0; j < width; j++) {
+                sb.append(" ");
+            }
+            sb.append("|\n");
+        }
+
+        // Нижняя граница
+        sb.append("+");
+        for (int i = 0; i < width; i++) {
+            sb.append("-");
+        }
+        sb.append("+\n");
+
+        return sb.toString();
     }
 }

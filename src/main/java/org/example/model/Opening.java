@@ -5,11 +5,11 @@ import java.util.Objects;
 public class Opening {
 
     private OpeningType type;
-    private double width;
-    private double height;
+    private int width;
+    private int height;
 
 
-    public Opening(OpeningType type, double width, double height) {
+    public Opening(OpeningType type, int width, int height) {
         if (width < 0 || height < 0) {
             throw new IllegalArgumentException("Openings area cannot be negative");
         }
@@ -23,22 +23,22 @@ public class Opening {
         return type;
     }
 
-    public double getWidth() {
+    public int getWidth() {
         return width;
     }
 
-    public double getHeight() {
+    public int getHeight() {
         return height;
     }
 
-    public double area() {
+    public int area() {
         return width * height;
     }
 
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Opening opening)) return false;
-        return Double.compare(width, opening.width) == 0 && Double.compare(height, opening.height) == 0 && type == opening.type;
+        return Integer.compare(width, opening.width) == 0 && Integer.compare(height, opening.height) == 0 && type == opening.type;
     }
 
     @Override

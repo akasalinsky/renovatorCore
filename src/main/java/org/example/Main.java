@@ -14,13 +14,13 @@ public class Main {
         Room kitchen = new Room("Кухня", 2.700, 3.400, 2.740, 5.850000);
         Room bathroom = new Room("Ванная", 2.700, 2.100, 1.700, 1.340000);*/
 
-        Opening hallDoor = new Opening(OpeningType.DOOR, 0.8, 2.2);
-        Opening hallWindow = new Opening(OpeningType.WINDOW, 1.0, 1.0);
+        Opening hallDoor = new Opening(OpeningType.DOOR, 800, 2200);
+        Opening hallWindow = new Opening(OpeningType.WINDOW, 1000, 1000);
 
-        Opening bathroomDoor = new Opening(OpeningType.DOOR, 0.8, 2.2);
+        Opening bathroomDoor = new Opening(OpeningType.DOOR, 800, 2200);
 
-        Opening kitchenDoor = new Opening(OpeningType.DOOR, 0.8, 2.2);
-        Opening kitchenWindow = new Opening(OpeningType.WINDOW, 1.0, 1.0);
+        Opening kitchenDoor = new Opening(OpeningType.DOOR, 800, 2200);
+        Opening kitchenWindow = new Opening(OpeningType.WINDOW, 1000, 1000);
 
         Opening hallwayDoor1 = hallDoor;
         Opening hallwayDoor2 = bathroomDoor;
@@ -32,10 +32,10 @@ public class Main {
         List<Opening> hallwayOpennigsList = List.of(hallwayDoor1, hallwayDoor2, hallwayDoor3);
 
 
-        Room hall = new Room("Hall", 4.610, 3.540, 2.700, hallOpennigsList);
-        Room hallway = new Room("Hallway", 4.600, 1.200, 2.700, hallwayOpennigsList);
-        Room kitchen = new Room("Kitchen", 2.740, 3.400, 2.700, kitchenOpennigsList);
-        Room bathroom = new Room("Bathroom", 1.700, 2.100, 2.700, bathroomOpennigsList);
+        Room hall = new Room("Hall", 4610, 3540, 2700, hallOpennigsList);
+        Room hallway = new Room("Hallway", 4600, 1200, 2700, hallwayOpennigsList);
+        Room kitchen = new Room("Kitchen", 2740, 3400, 2700, kitchenOpennigsList);
+        Room bathroom = new Room("Bathroom", 1700, 2100, 2700, bathroomOpennigsList);
 
 
         System.out.println(hall.describe());

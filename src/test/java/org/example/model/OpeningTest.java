@@ -11,8 +11,8 @@ public class OpeningTest {
     void shouldCreateOpeningWithCorrectParameters() {
         // Given
         OpeningType type = OpeningType.WINDOW;
-        double width = 1.5;
-        double height = 2.0;
+        int width = 1500;
+        int height = 2000;
 
         // When
         Opening opening = new Opening(type, width, height);
@@ -27,8 +27,8 @@ public class OpeningTest {
     void shouldThrowIllegalArgumentExceptionWhenWidthIsZeroOrNegative() {
         // Given
         OpeningType type = OpeningType.DOOR;
-        double invalidWidth = -0.5; // or 0.0
-        double height = 2.0;
+        int invalidWidth = -500; // or 0.0
+        int height = 2000;
 
         // When / Then
         assertThatThrownBy(() -> new Opening(type, invalidWidth, height))
@@ -40,8 +40,8 @@ public class OpeningTest {
     void shouldThrowIllegalArgumentExceptionWhenHeightIsZeroOrNegative() {
         // Given
         OpeningType type = OpeningType.WINDOW;
-        double width = 1.5;
-        double invalidHeight = -1.0;
+        int width = 1500;
+        int invalidHeight = -1000;
 
         // When / Then
         assertThatThrownBy(() -> new Opening(type, width, invalidHeight))
@@ -52,20 +52,20 @@ public class OpeningTest {
     @Test
     void areaShouldReturnWidthMultipliedByHeight() {
         // Given
-        Opening opening = new Opening(OpeningType.WINDOW, 1.5, 2.0);
+        Opening opening = new Opening(OpeningType.WINDOW, 1500, 2000);
 
         // When
-        double calculatedArea = opening.area();
+        int calculatedArea = opening.area();
 
         // Then
-        assertThat(calculatedArea).isEqualTo(1.5 * 2.0);
+        assertThat(calculatedArea).isEqualTo(1500 * 2000);
     }
 
     @Test
     void equalOpeningsShouldBeEqual() {
         // Given
-        Opening opening1 = new Opening(OpeningType.WINDOW, 1.5, 2.0);
-        Opening opening2 = new Opening(OpeningType.WINDOW, 1.5, 2.0);
+        Opening opening1 = new Opening(OpeningType.WINDOW, 1500, 2000);
+        Opening opening2 = new Opening(OpeningType.WINDOW, 1500, 2000);
 
         // Then
         assertThat(opening1).isEqualTo(opening2);
@@ -75,10 +75,10 @@ public class OpeningTest {
     @Test
     void differentOpeningsShouldNotBeEqual() {
         // Given
-        Opening opening1 = new Opening(OpeningType.WINDOW, 1.5, 2.0);
-        Opening opening2 = new Opening(OpeningType.DOOR, 1.5, 2.0);   // другой тип
-        Opening opening3 = new Opening(OpeningType.WINDOW, 2.0, 2.0); // другая ширина
-        Opening opening4 = new Opening(OpeningType.WINDOW, 1.5, 2.5); // другая высота
+        Opening opening1 = new Opening(OpeningType.WINDOW, 1500, 2000);
+        Opening opening2 = new Opening(OpeningType.DOOR, 1500, 2000);   // другой тип
+        Opening opening3 = new Opening(OpeningType.WINDOW, 2000, 2000); // другая ширина
+        Opening opening4 = new Opening(OpeningType.WINDOW, 1500, 2500); // другая высота
 
         // Then
         assertThat(opening1).isNotEqualTo(opening2);
@@ -89,8 +89,8 @@ public class OpeningTest {
     @Test
     void hashCodeShouldBeConsistentWithEquals() {
         // Given
-        Opening opening1 = new Opening(OpeningType.WINDOW, 1.5, 2.0);
-        Opening opening2 = new Opening(OpeningType.WINDOW, 1.5, 2.0);
+        Opening opening1 = new Opening(OpeningType.WINDOW, 1500, 2000);
+        Opening opening2 = new Opening(OpeningType.WINDOW, 1500, 2000);
 
         // When
         int hash1 = opening1.hashCode();
@@ -104,8 +104,8 @@ public class OpeningTest {
     void toStringShouldContainTypeWidthAndHeight() {
         // Given
         OpeningType type = OpeningType.WINDOW;
-        double width = 1.5;
-        double height = 2.0;
+        int width = 1500;
+        int height = 2000;
         Opening opening = new Opening(type, width, height);
 
         // When
