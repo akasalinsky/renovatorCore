@@ -1,8 +1,6 @@
 package org.example;
 
-import org.example.model.Opening;
-import org.example.model.OpeningType;
-import org.example.model.Room;
+import org.example.model.*;
 
 import java.util.List;
 
@@ -26,19 +24,31 @@ public class Main {
         Opening hallwayDoor2 = bathroomDoor;
         Opening hallwayDoor3 = kitchenDoor;
 
-        List<Opening> hallOpennigsList = List.of(hallDoor, hallWindow);
+
+        Wall hallWall1 = new Wall(4610);
+        Wall hallWall2 = new Wall(3020, List.of(new WallOpening(hallDoor, 100, 0)));
+        Wall hallWall3 = new Wall(4610);
+        Wall hallWall4 = new Wall(3020, List.of(new WallOpening(hallWindow, 1000, 1000)));
+
+        Room hall = new Room("Hall", 2700, List.of(hallWall1, hallWall2, hallWall3, hallWall4), List.of(90, 90, 90, 90));
+
+
+        System.out.println(hall.renderPlan(1000));
+
+
+        /*List<Opening> hallOpennigsList = List.of(hallDoor, hallWindow);
         List<Opening> bathroomOpennigsList = List.of(bathroomDoor);
         List<Opening> kitchenOpennigsList = List.of(kitchenDoor, kitchenWindow);
-        List<Opening> hallwayOpennigsList = List.of(hallwayDoor1, hallwayDoor2, hallwayDoor3);
+        List<Opening> hallwayOpennigsList = List.of(hallwayDoor1, hallwayDoor2, hallwayDoor3);*/
 
 
-        Room hall = new Room("Hall", 4610, 3540, 2700, hallOpennigsList);
+       /* Room hall = new Room("Hall", 4610, 3540, 2700, hallOpennigsList);
         Room hallway = new Room("Hallway", 4600, 1200, 2700, hallwayOpennigsList);
         Room kitchen = new Room("Kitchen", 2740, 3400, 2700, kitchenOpennigsList);
-        Room bathroom = new Room("Bathroom", 1700, 2100, 2700, bathroomOpennigsList);
+        Room bathroom = new Room("Bathroom", 1700, 2100, 2700, bathroomOpennigsList);*/
 
 
-        System.out.println(hall.describe());
+        /*System.out.println(hall.describe());
         System.out.println(hallway.describe());
         System.out.println(kitchen.describe());
         System.out.println(bathroom.describe());
@@ -46,7 +56,7 @@ public class Main {
         System.out.println(hall.getlaminatePlank());
         System.out.println(hallway.getlaminatePlank());
         System.out.println(kitchen.getlaminatePlank());
-        System.out.println(bathroom.getlaminatePlank());
+        System.out.println(bathroom.getlaminatePlank());*/
 
         /*lanovskogo.addRoom(hall);
         lanovskogo.addRoom(hallway);

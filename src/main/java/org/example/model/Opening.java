@@ -31,7 +31,7 @@ public class Opening {
         return height;
     }
 
-    public int area() {
+    public int getArea() {
         return width * height;
     }
 

@@ -10,56 +10,142 @@ import java.util.UUID;
 class WallTest {
 
     @Nested
-    class ConstructorValidation {
+    class ConstructorAndValidation {
 
         @Test
-        void shouldCreateWallSuccessfully() {
-            // Given
+        void shouldCreateWallWithEmptyOpeningsList() {
+            Wall wall = new Wall(5000);
+            assertThat(wall.getLength()).isEqualTo(5000);
+            assertThat(wall.getWallOpenings()).isEmpty();
+        }
+
+        @Test
+        void shouldCreateWallWithProvidedOpeningsList() {
             Opening opening = new Opening(OpeningType.WINDOW, 1000, 1000);
-            List<Opening> openings = List.of(opening);
+            WallOpening wallOpening = new WallOpening(opening, 1000, 0);
+            List<WallOpening> openings = List.of(wallOpening);
 
-            // When
-            Wall wall = new Wall(3000, 90, openings);
+            Wall wall = new Wall(5000, openings);
 
-            // Then
-            assertThat(wall.length()).isEqualTo(3000);
-            assertThat(wall.angle()).isEqualTo(90);
-            assertThat(wall.openings()).hasSize(1).contains(opening);
+            assertThat(wall.getLength()).isEqualTo(5000);
+            assertThat(wall.getWallOpenings()).hasSize(1).contains(wallOpening);
         }
 
         @Test
         void shouldThrowIllegalArgumentExceptionForNonPositiveLength() {
-            assertThatThrownBy(() -> new Wall(0, 90, List.of()))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("Length must be positive");
-        }
-
-        @Test
-        void shouldThrowIllegalArgumentExceptionForInvalidAngle() {
-            assertThatThrownBy(() -> new Wall(3000, 0, List.of()))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("Angle must be greater than 0 and less than 360");
-            assertThatThrownBy(() -> new Wall(3000, 360, List.of()))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("Angle must be greater than 0 and less than 360");
+            assertThatThrownBy(() -> new Wall(0))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         void shouldReplaceNullOpeningsListWithEmptyList() {
-            Wall wall = new Wall(3000, 90, null);
-            assertThat(wall.openings()).isNotNull().isEmpty();
+            Wall wall = new Wall(5000, null);
+            assertThat(wall.getWallOpenings()).isNotNull().isEmpty();
         }
 
         @Test
         void shouldReturnImmutableOpeningsList() {
             Opening opening = new Opening(OpeningType.WINDOW, 1000, 1000);
-            List<Opening> mutableList = new java.util.ArrayList<>(List.of(opening));
-            Wall wall = new Wall(3000, 90, mutableList);
+            WallOpening wallOpening = new WallOpening(opening, 1000, 0);
+            List<WallOpening> mutableList = new java.util.ArrayList<>(List.of(wallOpening));
+            Wall wall = new Wall(5000, mutableList);
 
-            List<Opening> retrievedList = wall.openings();
-            assertThatThrownBy(() -> retrievedList.add(new Opening(OpeningType.DOOR, 1000, 1000)))
+            List<WallOpening> retrievedList = wall.getWallOpenings();
+            assertThatThrownBy(() -> retrievedList.add(new WallOpening(opening, 2000, 0)))
                     .isInstanceOf(UnsupportedOperationException.class);
         }
+
+        @Test
+        void shouldThrowIllegalArgumentExceptionIfAnyOpeningExceedsWallLength() {
+            Opening opening = new Opening(OpeningType.WINDOW, 3000, 1000);
+            WallOpening wallOpening = new WallOpening(opening, 2100, 0); // 2100 + 3000 = 5100 > 5000
+            List<WallOpening> openings = List.of(wallOpening);
+
+            assertThatThrownBy(() -> new Wall(5000, openings))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Wall opening width and distanceFromLeft is too big");
+        }
+    }
+
+    @Nested
+    class WithOpeningMethod {
+
+        @Test
+        void shouldAddOpeningAndReturnNewWallKeepingOriginalUnchanged() {
+            Opening opening1 = new Opening(OpeningType.WINDOW, 1000, 1000);
+            WallOpening wallOpening1 = new WallOpening(opening1, 1000, 0);
+            Wall originalWall = new Wall(5000, List.of(wallOpening1));
+
+            Opening opening2 = new Opening(OpeningType.DOOR, 1000, 2000);
+            WallOpening wallOpening2 = new WallOpening(opening2, 3000, 0);
+
+            Wall updatedWall = originalWall.withOpening(wallOpening2);
+
+            assertThat(updatedWall.getLength()).isEqualTo(originalWall.getLength());
+            assertThat(updatedWall.getWallOpenings()).hasSize(2).contains(wallOpening1, wallOpening2);
+
+            assertThat(originalWall.getWallOpenings()).hasSize(1).containsExactly(wallOpening1);
+        }
+
+        @Test
+        void shouldThrowIllegalArgumentExceptionIfNewOpeningExceedsWallLength() {
+            Wall wall = new Wall(5000);
+            Opening opening = new Opening(OpeningType.WINDOW, 3000, 1000);
+            WallOpening wallOpening = new WallOpening(opening, 2100, 0); // 2100 + 3000 = 5100 > 5000
+
+            assertThatThrownBy(() -> wall.withOpening(wallOpening))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("Wall opening width and distanceFromLeft is too big");
+        }
+
+        @Test
+        void shouldThrowNpeIfNewOpeningIsNull() {
+            Wall wall = new Wall(5000);
+            assertThatThrownBy(() -> wall.withOpening(null))
+                    .isInstanceOf(NullPointerException.class);
+        }
+
+        @Test
+        void shouldChainMultipleWithOpeningCalls() {
+            Wall wall = new Wall(10000);
+            Opening opening1 = new Opening(OpeningType.WINDOW, 1000, 1000);
+            WallOpening wallOpening1 = new WallOpening(opening1, 1000, 0);
+            Opening opening2 = new Opening(OpeningType.DOOR, 2000, 2000);
+            WallOpening wallOpening2 = new WallOpening(opening2, 5000, 0);
+
+            Wall finalWall = wall.withOpening(wallOpening1).withOpening(wallOpening2);
+
+            assertThat(finalWall.getWallOpenings()).hasSize(2).contains(wallOpening1, wallOpening2);
+        }
+    }
+
+    @Nested
+    class WithoutOpeningMethod {
+
+        /*@Test
+        void shouldRemoveOpeningByIdAndReturnNewWallKeepingOriginalUnchanged() {
+            UUID idToRemove = UUID.randomUUID();
+            Opening openingToRemove = new Opening(OpeningType.WINDOW, 1000, 1000, idToRemove);
+            WallOpening wallOpeningToRemove = new WallOpening(openingToRemove, 1000, 0);
+            Opening otherOpening = new Opening(OpeningType.DOOR, 1000, 2000);
+            WallOpening otherWallOpening = new WallOpening(otherOpening, 3000, 0);
+
+            Wall originalWall = new Wall(5000, List.of(wallOpeningToRemove, otherWallOpening));
+
+            Wall updatedWall = originalWall.withoutOpening(idToRemove);
+
+            assertThat(updatedWall.openings()).hasSize(1).contains(otherWallOpening);
+            assertThat(originalWall.openings()).hasSize(2).contains(wallOpeningToRemove, otherWallOpening);
+        }*/
+
+        /*@Test
+        void shouldThrowNoSuchElementExceptionIfIdNotFound() {
+            UUID nonExistentId = UUID.randomUUID();
+            Wall wall = new Wall(5000);
+
+            assertThatThrownBy(() -> wall.withoutOpening(nonExistentId))
+                    .isInstanceOf(NoSuchElementException.class);
+        }*/
     }
 
     @Nested
@@ -67,173 +153,57 @@ class WallTest {
 
         @Test
         void totalOpeningsAreaShouldSumAreasOfAllOpenings() {
-            // Given
-            Opening window = new Opening(OpeningType.WINDOW, 1200, 1500); // area = 1.8
-            Opening door = new Opening(OpeningType.DOOR, 900, 2000); // area = 1.8
-            Wall wall = new Wall(3000, 90, List.of(window, door));
+            Opening opening1 = new Opening(OpeningType.WINDOW, 1200, 1500); // area = 1800000
+            Opening opening2 = new Opening(OpeningType.DOOR, 900, 2000); // area = 1800000
+            WallOpening wallOpening1 = new WallOpening(opening1, 1000, 0);
+            WallOpening wallOpening2 = new WallOpening(opening2, 3000, 0);
+            Wall wall = new Wall(5000, List.of(wallOpening1, wallOpening2));
 
-            // When
-            int totalArea = wall.totalOpeningsArea();
+            double totalArea = wall.totalOpeningsArea();
 
-            // Then
-            assertThat(totalArea).isEqualTo(3600000);
-        }
-    }
-
-        /*@Test
-        void totalOpeningsAreaShouldReturnZeroForEmptyOpeningsList() {
-            Wall wall = new Wall(3.0, 90.0, List.of());
-
-            assertThat(wall.totalOpeningsArea()).isEqualTo(0.0);
+            assertThat(totalArea).isEqualTo(3600000); // 1800000 + 1800000
         }
 
         @Test
         void netAreaShouldSubtractTotalOpeningsAreaFromGrossArea() {
-            // Given
-            Opening window = new Opening(OpeningType.WINDOW, 1.2, 1.5);
-            Opening door = new Opening(OpeningType.DOOR, 0.9, 2.0);
-            Wall wall = new Wall(3.0, 90.0, List.of(window, door)); // totalOpeningsArea = 3.6
-            int height = 2.5; // gross area = 3.0 * 2.5 = 7.5
+            Opening opening1 = new Opening(OpeningType.WINDOW, 1200, 1500); // area = 1800000
+            Opening opening2 = new Opening(OpeningType.DOOR, 900, 2000); // area = 1800000
+            WallOpening wallOpening1 = new WallOpening(opening1, 1000, 0);
+            WallOpening wallOpening2 = new WallOpening(opening2, 3000, 0);
+            Wall wall = new Wall(5000, List.of(wallOpening1, wallOpening2)); // totalOpeningsArea = 3600000
+            // gross area = 5000 * 2500 = 12500000
 
-            // When
-            int netArea = wall.netArea(height);
+            double netArea = wall.netArea();
 
-            // Then
-            assertThat(netArea).isEqualTo(3.9); // 7.5 - 3.6
-        }
-    }
-
-/*    @Nested
-    class Immutability {
-
-        @Test
-        void withOpeningShouldReturnNewWallAndKeepOriginalUnchanged() {
-            // Given
-            Opening initialOpening = new Opening(OpeningType.WINDOW, 1.0, 1.0);
-            Wall originalWall = new Wall(3.0, 90.0, List.of(initialOpening));
-            Opening newOpening = new Opening(OpeningType.DOOR, 0.9, 2.0);
-
-            // When
-            Wall updatedWall = originalWall.withOpening(newOpening);
-
-            // Then
-            assertThat(updatedWall.length()).isEqualTo(originalWall.length());
-            assertThat(updatedWall.angle()).isEqualTo(originalWall.angle());
-            assertThat(updatedWall.openings()).hasSize(2).contains(initialOpening, newOpening);
-
-            assertThat(originalWall.openings()).hasSize(1).containsExactly(initialOpening);
-        }
-
-        @Test
-        void withOpeningShouldThrowNpeForNullOpening() {
-            Wall wall = new Wall(3.0, 90.0, List.of());
-            assertThatThrownBy(() -> wall.withOpening(null))
-                    .isInstanceOf(NullPointerException.class);
-        }
-
-        @Test
-        void withoutOpeningShouldRemoveOpeningByIdAndKeepOriginalUnchanged() {
-            // Given
-            UUID idToRemove = UUID.randomUUID();
-            Opening openingToRemove = new Opening(OpeningType.WINDOW, 1.0, 1.0, idToRemove);
-            Opening otherOpening = new Opening(OpeningType.DOOR, 0.9, 2.0);
-            Wall originalWall = new Wall(3.0, 90.0, List.of(otherOpening, openingToRemove));
-
-            // When
-            Wall updatedWall = originalWall.withoutOpening(idToRemove);
-
-            // Then
-            assertThat(updatedWall.openings()).hasSize(1).contains(otherOpening);
-            assertThat(originalWall.openings()).hasSize(2).contains(openingToRemove, otherOpening);
-        }
-
-        @Test
-        void withoutOpeningShouldThrowNoSuchElementExceptionIfIdNotFound() {
-            Wall wall = new Wall(3.0, 90.0, List.of(new Opening(OpeningType.WINDOW, 1.0, 1.0)));
-            UUID nonExistentId = UUID.randomUUID();
-
-            assertThatThrownBy(() -> wall.withoutOpening(nonExistentId))
-                    .isInstanceOf(NoSuchElementException.class);
+            assertThat(netArea).isEqualTo(8900000); // 12500000 - 3600000
         }
     }
 
     @Nested
-    class Equality {
+    class EqualityAndHashCode {
 
         @Test
         void equalWallsShouldHaveSameHashCode() {
-            Opening opening1 = new Opening(OpeningType.WINDOW, 1.0, 1.0);
-            Opening opening2 = new Opening(OpeningType.DOOR, 0.9, 2.0);
-            Wall wall1 = new Wall(3.0, 90.0, List.of(opening1, opening2));
-            Wall wall2 = new Wall(3.0, 90.0, List.of(opening1, opening2));
+            Opening opening1 = new Opening(OpeningType.WINDOW, 1000, 1000);
+            WallOpening wallOpening1 = new WallOpening(opening1, 1000, 0);
+            Opening opening2 = new Opening(OpeningType.DOOR, 1000, 2000);
+            WallOpening wallOpening2 = new WallOpening(opening2, 3000, 0);
+
+            Wall wall1 = new Wall(5000, List.of(wallOpening1, wallOpening2));
+            Wall wall2 = new Wall(5000, List.of(wallOpening1, wallOpening2));
 
             assertThat(wall1).isEqualTo(wall2);
             assertThat(wall1.hashCode()).isEqualTo(wall2.hashCode());
         }
 
         @Test
-        void unequalWallsShouldHaveDifferentHashCodes() {
-            Wall wall1 = new Wall(3.0, 90.0, List.of(new Opening(OpeningType.WINDOW, 1.0, 1.0)));
-            Wall wall2 = new Wall(4.0, 90.0, List.of(new Opening(OpeningType.WINDOW, 1.0, 1.0)));
+        void unequalWallsShouldNotBeEqual() {
+            Wall wall1 = new Wall(5000, List.of());
+            Wall wall2 = new Wall(6000, List.of());
+            Wall wall3 = new Wall(5000, List.of(new WallOpening(new Opening(OpeningType.WINDOW, 1000, 1000), 1000, 0)));
 
             assertThat(wall1).isNotEqualTo(wall2);
-        }
-
-        @Test
-        void wallShouldBeEqualToItself() {
-            Wall wall = new Wall(3.0, 90.0, List.of(new Opening(OpeningType.WINDOW, 1.0, 1.0)));
-            assertThat(wall).isEqualTo(wall);
-        }
-
-        @Test
-        void wallShouldNotBeEqualToNull() {
-            Wall wall = new Wall(3.0, 90.0, List.of(new Opening(OpeningType.WINDOW, 1.0, 1.0)));
-            assertThat(wall).isNotEqualTo(null);
-        }
-
-        @Test
-        void wallShouldNotBeEqualToDifferentType() {
-            Wall wall = new Wall(3.0, 90.0, List.of(new Opening(OpeningType.WINDOW, 1.0, 1.0)));
-            assertThat(wall).isNotEqualTo("not a wall");
-        }
-
-        @Test
-        void wallShouldNotBeEqualToAnotherWithDifferentLength() {
-            Wall wall1 = new Wall(3.0, 90.0, List.of(new Opening(OpeningType.WINDOW, 1.0, 1.0)));
-            Wall wall2 = new Wall(4.0, 90.0, List.of(new Opening(OpeningType.WINDOW, 1.0, 1.0)));
-            assertThat(wall1).isNotEqualTo(wall2);
-        }
-
-        @Test
-        void wallShouldNotBeEqualToAnotherWithDifferentAngle() {
-            Wall wall1 = new Wall(3.0, 90.0, List.of(new Opening(OpeningType.WINDOW, 1.0, 1.0)));
-            Wall wall2 = new Wall(3.0, 180.0, List.of(new Opening(OpeningType.WINDOW, 1.0, 1.0)));
-            assertThat(wall1).isNotEqualTo(wall2);
-        }
-
-        @Test
-        void wallShouldNotBeEqualToAnotherWithDifferentOpenings() {
-            Wall wall1 = new Wall(3.0, 90.0, List.of(new Opening(OpeningType.WINDOW, 1.0, 1.0)));
-            Wall wall2 = new Wall(3.0, 90.0, List.of(new Opening(OpeningType.DOOR, 1.0, 1.0)));
-            assertThat(wall1).isNotEqualTo(wall2);
+            assertThat(wall1).isNotEqualTo(wall3);
         }
     }
-
-    @Nested
-    class ToString {
-
-        @Test
-        void toStringShouldContainLengthAngleAndOpeningsCount() {
-            Opening opening1 = new Opening(OpeningType.WINDOW, 1.0, 1.0);
-            Opening opening2 = new Opening(OpeningType.DOOR, 0.9, 2.0);
-            Wall wall = new Wall(3.0, 90.0, List.of(opening1, opening2));
-
-            String toString = wall.toString();
-
-            assertThat(toString).isNotNull()
-                    .contains("3.0")
-                    .contains("90.0")
-                    .contains("2"); // количество проёмов
-        }
-    }*/
 }

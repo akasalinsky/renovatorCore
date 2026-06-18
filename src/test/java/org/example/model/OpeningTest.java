@@ -55,7 +55,7 @@ public class OpeningTest {
         Opening opening = new Opening(OpeningType.WINDOW, 1500, 2000);
 
         // When
-        int calculatedArea = opening.area();
+        int calculatedArea = opening.getArea();
 
         // Then
         assertThat(calculatedArea).isEqualTo(1500 * 2000);

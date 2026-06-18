@@ -15,52 +15,44 @@ public class Room {
     private final int STANDARTROOLLENGTH = 10000;
     private final int STANDARTPLANKWIDTH = 160;
     private final int STANDARTPLANKLENGTH = 1286;
-    private List<Opening> openings = new ArrayList<>();
+    private List<Wall> walls = new ArrayList<>();
+    private List<Integer> angles = new  ArrayList<>();
 
-    public int getOpeningsArea(){
-        int openeingsArea = 0;
-        for(Opening opening: openings){
-            openeingsArea += opening.area();
+
+
+    public Room(String name, int height, List<Wall> walls, List<Integer> angles) {
+        if (walls == null) {
+            throw new IllegalArgumentException("Walls couldn't be null");
         }
-        return openeingsArea;
-    }
-
-
-    public Room(String name, int length, int width, int height, int openingsArea) {
-        this(name, length, width, height,
-                List.of(new Opening(OpeningType.TOTAL_AREA, openingsArea, 1)));
-    }
-
-    public Room(String name, int length, int width, int height, List<Opening> openings) {
-        if (openings == null) {
-            openings = new ArrayList<>();
+        if (walls.isEmpty()) {
+            throw new IllegalArgumentException("Walls couldn't be empty");
         }
-        if (length <= 0) {
-            throw new IllegalArgumentException("Length must be positive");
+        for(Wall wall: walls){
+            if (wall == null) {
+                throw new IllegalArgumentException("Wall couldn't be null");
+            }
         }
-        if (width <= 0) {
-            throw new IllegalArgumentException("Width must be positive");
+        if (angles == null) {
+            throw new IllegalArgumentException("Angles couldn't be a null");
+        }
+        for(Integer integer : angles){
+            if (0 >= integer || integer >= 360) {
+                throw new IllegalArgumentException("Angles couldn't be more a 360 or less a 0");
+            }
         }
         if (height <= 0) {
             throw new IllegalArgumentException("Height must be positive");
         }
 
-        int totalWallArea = 2 * (length + width) * height;
-        int openingsArea = 0;
-
-        for (Opening opening : openings) {
-            openingsArea += opening.area();
-        }
-
-        if (openingsArea > totalWallArea) {
-            throw new IllegalArgumentException("Openings area cannot exceed total wall area");
-        }
-
         this.name = name;
-        this.length = length;
-        this.width = width;
         this.height = height;
-        this.openings = openings;
+        for (Wall wall : walls) {
+            wall.setHeight(height);
+        }
+        this.walls = Collections.unmodifiableList(walls);
+        this.angles = Collections.unmodifiableList(angles);
+        this.width = walls.get(0).getLength();
+        this.length = walls.get(1).getLength();
     }
 
     public int getFloorArea() {
@@ -92,21 +84,12 @@ public class Room {
     }
 
     public int getNetWallArea() {
-        return 2 * (length + width) * height - getOpeningsArea();
-    }
-
-    public Room withOpeningsArea(int v) {
-        int totalWallArea = 2 * (length + width) * height;
-        if (getOpeningsArea() > totalWallArea) {
-            throw new IllegalArgumentException("Openings area cannot exceed total wall area");
-        }
-
-        return new Room(name, length, width, height, v);
+        return 2 * (length + width) * height - totalOpeningsArea();
     }
 
     public String describe() {
-        return String.format(Locale.US,"Room %1d%2d%3d, openings: %4dm²",
-                length, width, height, getOpeningsArea());
+        return String.format(Locale.US,"Room %1s: walls count:%2d; height:%3d, openings: %4dm²",
+                name, walls.size(), height, totalOpeningsArea());
     }
 
     public int getWallpaperRolls(int rollWidth, int rollLength) {
@@ -160,38 +143,164 @@ public class Room {
     }
 
     public List<Opening> getOpenings() {
-        return Collections.unmodifiableList(this.openings);
+        return Collections.unmodifiableList(new ArrayList<>());
     }
 
     public String renderPlan() {
-        int width = this.width/1000;
-        int length = this.length/1000;
+        return renderPlan(1000);
+    }
 
-        StringBuilder sb = new StringBuilder();
+    public String renderPlan(int scale) {
+        int w = this.width/scale;   // ширина (восточная/западная стены)
+        int h = this.length/scale;  // длина (северная/южная стены)
 
-        // Верхняя граница
-        sb.append("+");
-        for (int i = 0; i < width; i++) {
-            sb.append("-");
-        }
-        sb.append("+\n");
+        // холст: строки 0..h, столбцы 0..w
+        char[][] canvas = new char[h + 2][w + 2];
 
-        // Боковые границы и внутреннее пространство
-        for (int i = 0; i < length; i++) {
-            sb.append("|");
-            for (int j = 0; j < width; j++) {
-                sb.append(" ");
+        // заполняем пробелами
+        for (int y = 0; y <= h; y++) {
+            for (int x = 0; x <= w; x++) {
+                canvas[y][x] = ' ';
             }
-            sb.append("|\n");
         }
 
-        // Нижняя граница
-        sb.append("+");
-        for (int i = 0; i < width; i++) {
-            sb.append("-");
-        }
-        sb.append("+\n");
+        // углы
+        canvas[0][0] = '+';
+        canvas[0][w+1] = '+';
+        canvas[h+1][0] = '+';
+        canvas[h+1][w+1] = '+';
 
+        // горизонтальные стены (север и юг)
+        for (int x = 1; x < w+1; x++) {
+            canvas[0][x] = '-';
+            canvas[h+1][x] = '-';
+        }
+
+        // вертикальные стены (запад и восток)
+        for (int y = 1; y < h+1; y++) {
+            canvas[y][0] = '|';
+            canvas[y][w+1] = '|';
+        }
+
+        // проёмы на стенах
+        // стена 0: север (y=0, горизонтально)
+        if (walls.size() > 0) {
+            for (WallOpening wo : walls.get(0).getWallOpenings()) {
+                int start = 1 + wo.distanceFromLeft()/1000;
+                int opW = wo.opening().getWidth()/1000;
+                if (opW == 0 && wo.opening().getWidth() > 0) {
+                    opW = 1;
+                }
+                for (int i = 0; i < opW; i++) {
+                    int x = start + i;
+                    if (x >= 1 && x < w+1) {
+                        canvas[0][x] = ' ';
+                    }
+                }
+            }
+        }
+
+        // стена 1: восток (x=w, вертикально)
+        if (walls.size() > 1) {
+            for (WallOpening wo : walls.get(1).getWallOpenings()) {
+                int start = 1 + wo.distanceFromLeft()/1000;
+                int opW = wo.opening().getWidth()/1000;
+                if (opW == 0 && wo.opening().getWidth() > 0) {
+                    opW = 1;
+                }
+                for (int i = 0; i < opW; i++) {
+                    int y = start + i;
+                    if (y >= 1 && y < h+1) {
+                        canvas[y][w+1] = ' ';
+                    }
+                }
+            }
+        }
+
+        // стена 2: юг (y=h, горизонтально)
+        if (walls.size() > 2) {
+            for (WallOpening wo : walls.get(2).getWallOpenings()) {
+                int start = 1 + wo.distanceFromLeft()/1000;
+                int opW = wo.opening().getWidth()/1000;
+                if (opW == 0 && wo.opening().getWidth() > 0) {
+                    opW = 1;
+                }
+                for (int i = 0; i < opW; i++) {
+                    int x = start + i;
+                    if (x >= 1 && x < w+1) {
+                        canvas[h+1][x] = ' ';
+                    }
+                }
+            }
+        }
+
+        // стена 3: запад (x=0, вертикально)
+        if (walls.size() > 3) {
+            for (WallOpening wo : walls.get(3).getWallOpenings()) {
+                int start = 1 + wo.distanceFromLeft()/1000;
+                int opW = wo.opening().getWidth()/1000;
+                if (opW == 0 && wo.opening().getWidth() > 0) {
+                    opW = 1;
+                }
+                for (int i = 0; i < opW; i++) {
+                    int y = start + i;
+                    if (y >= 1 && y < h+1) {
+                        canvas[y][0] = ' ';
+                    }
+                }
+            }
+        }
+
+        // сборка строки
+        StringBuilder sb = new StringBuilder();
+        for (int y = 0; y <= h+1; y++) {
+            for (int x = 0; x <= w+1; x++) {
+                sb.append(canvas[y][x]);
+            }
+            sb.append('\n');
+        }
         return sb.toString();
+    }
+
+    public List<Wall> getWalls() {
+        return Collections.unmodifiableList(walls);
+    }
+
+    public List<Integer> getAngles() {
+        return Collections.unmodifiableList(angles);
+    }
+
+    public int totalWallArea() {
+        int totalWallArea = 0;
+        if (!walls.isEmpty()){
+            for(Wall wall: walls){
+                totalWallArea += wall.getArea();
+            }
+        }
+        return totalWallArea;
+    }
+
+    public int totalOpeningsArea() {
+        int totalOpeningsArea = 0;
+        if (!walls.isEmpty()){
+            for(Wall wall: walls){
+                totalOpeningsArea += wall.totalOpeningsArea();
+            }
+        }
+        return totalOpeningsArea;
+    }
+
+    public int netWallArea() {
+        int netWallArea = 0;
+        if (!walls.isEmpty()){
+            for(Wall wall: walls){
+                netWallArea += wall.netArea();
+            }
+        }
+        return netWallArea;
+    }
+
+    public Room withOpening(int i, WallOpening wallOpening) {
+        throw new UnsupportedOperationException("Adding openings to walls is not yet supported.");
     }
 }
