@@ -1,5 +1,6 @@
 package org.example.model;
 
+import org.example.cli.RoomCli;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,10 +13,10 @@ class RoomCliTest {
 
     private RoomCli cli;
 
-    @BeforeEach
+    /*@BeforeEach
     void setUp() {
         cli = new RoomCli();
-    }
+    }*/
 
     @Nested
     @DisplayName("Create command")

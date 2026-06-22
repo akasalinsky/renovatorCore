@@ -88,7 +88,7 @@ public class Room {
     }
 
     public String describe() {
-        return String.format(Locale.US,"Room %1s: walls count:%2d; height:%3d, openings: %4dm²",
+        return String.format(Locale.US,"Room %1s: walls count:%2d; height: %3d, openings: %4dm²",
                 name, walls.size(), height, totalOpeningsArea());
     }
 
