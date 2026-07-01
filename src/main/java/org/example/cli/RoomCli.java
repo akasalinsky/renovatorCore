@@ -1,8 +1,7 @@
 package org.example.cli;
 
 import org.example.i18n.MessageProvider;
-import org.example.model.Room;
-import org.example.model.Wall;
+import org.example.model.*;
 
 import java.util.List;
 import java.util.Locale;
@@ -20,7 +19,8 @@ public class RoomCli {
             "обои", "wallpaper",
             "выход", "exit",
             "помощь", "help",
-            "язык", "lang"
+            "язык", "lang",
+            "проем", "opening"
     );
 
     public RoomCli() {
@@ -59,6 +59,8 @@ public class RoomCli {
                 return handleWallpaper(parts);
             case "exit":
                 return messageProvider.get("goodbye");
+            case "opening":
+                return handleOpening(parts);
             default:
                 return messageProvider.get("unknown.command", trimmed);
         }
@@ -75,7 +77,7 @@ public class RoomCli {
             int height = Integer.parseInt(parts[4]);
 
             boolean exists = currentRoom != null && currentRoom.getName().equals(name);
-            currentRoom = new Room(name, height, List.of(new Wall(length), new Wall(width), new Wall(length), new Wall(width)), List.of(90, 90, 90, 90));
+            currentRoom = new Room(name, height, List.of(new Wall(length, height, 0), new Wall(width, height, 1), new Wall(length, height, 2), new Wall(width, height, 3)), List.of(90, 90, 90, 90));
             return messageProvider.get("create.success", name);
 
         } catch (NumberFormatException e) {
@@ -103,7 +105,8 @@ public class RoomCli {
                 return messageProvider.get("plan.usage");
             }
         }
-        return currentRoom.renderPlan(scale);
+        String plan = currentRoom.renderPlanWithNumbers(scale);
+        return "<pre>" + plan + "</pre>";
     }
 
     private String handleArea() {
@@ -119,16 +122,71 @@ public class RoomCli {
         if (currentRoom == null) {
             return messageProvider.get("room.not.created");
         }
-        if (parts.length != 3) {
-            return messageProvider.get("wallpaper.usage");
+        if (parts.length == 1 ) {
+            try {
+                int rolls = currentRoom.getWallpaperRolls();
+                return messageProvider.get("wallpaper.rolls", rolls);
+            } catch (NumberFormatException e) {
+                return messageProvider.get("wallpaper.usage");
+            }
         }
-        try {
-            int rollWidth = Integer.parseInt(parts[1]);
-            int rollLength = Integer.parseInt(parts[2]);
-            int rolls = currentRoom.getWallpaperRolls(rollWidth, rollLength);
-            return messageProvider.get("wallpaper.rolls", rolls);
-        } catch (NumberFormatException e) {
-            return messageProvider.get("wallpaper.usage");
+        if (parts.length == 3 ) {
+            try {
+                int rollWidth = Integer.parseInt(parts[1]);
+                int rollLength = Integer.parseInt(parts[2]);
+                int rolls = currentRoom.getWallpaperRolls(rollWidth, rollLength);
+                return messageProvider.get("wallpaper.rolls", rolls);
+            } catch (NumberFormatException e) {
+                return messageProvider.get("wallpaper.usage");
+            }
         }
+            return messageProvider.get("wallpaper.usage");
+    }
+
+    private String handleOpening(String[] parts) {
+        if (currentRoom == null) {
+            return messageProvider.get("room.not.created");
+        }
+
+        if (parts.length == 7) {
+            try {
+                int wallNumber = Integer.parseInt(parts[1]);
+                int width = Integer.parseInt(parts[3]);
+                int height = Integer.parseInt(parts[4]);
+                int distanceFromLeft = Integer.parseInt(parts[5]);
+                int distanceFromFloor = Integer.parseInt(parts[6]);
+
+           /* if(OpeningName.equalsIgnoreCase("окно") || OpeningName.equalsIgnoreCase("windows")){openingType = OpeningType.WINDOW;}
+            if(OpeningName.equalsIgnoreCase("дверь") || OpeningName.equalsIgnoreCase("door")){openingType = OpeningType.DOOR;}
+            else {throw new IllegalArgumentException(messageProvider.get("opening.usage"));}
+*/
+                WallOpening wallOpening = new WallOpening(new Opening(OpeningType.WINDOW, width, height), distanceFromLeft, distanceFromFloor);
+
+                currentRoom = currentRoom.withOpening(wallNumber, wallOpening);
+                return messageProvider.get("opening.success");
+
+            } catch (NumberFormatException e) {
+                return messageProvider.get("opening.usage");
+            }
+
+        }
+        if (parts.length == 6) {
+            try {
+                int wallNumber = Integer.parseInt(parts[1]);
+                int width = Integer.parseInt(parts[3]);
+                int height = Integer.parseInt(parts[4]);
+                int distanceFromLeft = Integer.parseInt(parts[5]);
+
+                WallOpening wallOpening = new WallOpening(new Opening(OpeningType.DOOR, width, height), distanceFromLeft, 0);
+
+                currentRoom = currentRoom.withOpening(wallNumber, wallOpening);
+                return messageProvider.get("opening.success");
+
+            } catch (NumberFormatException e) {
+                return messageProvider.get("opening.usage");
+            }
+
+        }
+        return messageProvider.get("opening.usage");
     }
 }

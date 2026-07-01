@@ -18,6 +18,7 @@ public class BotService {
     private MessageProvider messageProvider;
 
 
+
     public BotService() {
         // Загружаем переменные окружения из файла .env
         Dotenv dotenv = Dotenv.configure().load();
@@ -39,10 +40,14 @@ public class BotService {
             throw new IllegalStateException("TELEGRAM_CHAT_ID должен быть числом", e);
         }
     }
-
     public String processMessage(long chatId, String text) {
+        return processMessage(chatId, text, DEFAULT_LOCALE);
+    }
+
+
+    public String processMessage(long chatId, String text, Locale locale) {
         Dotenv dotenv = Dotenv.configure().load();
-        Locale locale = userLocales.getOrDefault(chatId, DEFAULT_LOCALE);
+        //Locale locale = userLocales.getOrDefault(chatId, DEFAULT_LOCALE);
         messageProvider = new MessageProvider(locale);
 
         if (text == null) {
@@ -79,8 +84,6 @@ public class BotService {
             userSessions.remove(chatId);
             return messageProvider.get("goodbye");
         }
-
-
 
         // Get or create RoomCli instance for the user
         RoomCli cli = userSessions.computeIfAbsent(chatId, k -> new RoomCli(locale));

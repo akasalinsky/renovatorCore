@@ -14,7 +14,7 @@ class WallTest {
 
         @Test
         void shouldCreateWallWithEmptyOpeningsList() {
-            Wall wall = new Wall(5000);
+            Wall wall = new Wall(5000, 2500, 0);
             assertThat(wall.getLength()).isEqualTo(5000);
             assertThat(wall.getWallOpenings()).isEmpty();
         }
@@ -25,7 +25,7 @@ class WallTest {
             WallOpening wallOpening = new WallOpening(opening, 1000, 0);
             List<WallOpening> openings = List.of(wallOpening);
 
-            Wall wall = new Wall(5000, openings);
+            Wall wall = new Wall(5000, 2500, 0, openings);
 
             assertThat(wall.getLength()).isEqualTo(5000);
             assertThat(wall.getWallOpenings()).hasSize(1).contains(wallOpening);
@@ -33,13 +33,13 @@ class WallTest {
 
         @Test
         void shouldThrowIllegalArgumentExceptionForNonPositiveLength() {
-            assertThatThrownBy(() -> new Wall(0))
+            assertThatThrownBy(() -> new Wall(0, 2500, 0))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         void shouldReplaceNullOpeningsListWithEmptyList() {
-            Wall wall = new Wall(5000, null);
+            Wall wall = new Wall(5000, 2500, 0, null);
             assertThat(wall.getWallOpenings()).isNotNull().isEmpty();
         }
 
@@ -48,7 +48,7 @@ class WallTest {
             Opening opening = new Opening(OpeningType.WINDOW, 1000, 1000);
             WallOpening wallOpening = new WallOpening(opening, 1000, 0);
             List<WallOpening> mutableList = new java.util.ArrayList<>(List.of(wallOpening));
-            Wall wall = new Wall(5000, mutableList);
+            Wall wall = new Wall(5000, 2500, 0, mutableList);
 
             List<WallOpening> retrievedList = wall.getWallOpenings();
             assertThatThrownBy(() -> retrievedList.add(new WallOpening(opening, 2000, 0)))
@@ -61,7 +61,7 @@ class WallTest {
             WallOpening wallOpening = new WallOpening(opening, 2100, 0); // 2100 + 3000 = 5100 > 5000
             List<WallOpening> openings = List.of(wallOpening);
 
-            assertThatThrownBy(() -> new Wall(5000, openings))
+            assertThatThrownBy(() -> new Wall(5000, 2500, 0, openings))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessageContaining("Wall opening width and distanceFromLeft is too big");
         }
@@ -74,7 +74,7 @@ class WallTest {
         void shouldAddOpeningAndReturnNewWallKeepingOriginalUnchanged() {
             Opening opening1 = new Opening(OpeningType.WINDOW, 1000, 1000);
             WallOpening wallOpening1 = new WallOpening(opening1, 1000, 0);
-            Wall originalWall = new Wall(5000, List.of(wallOpening1));
+            Wall originalWall = new Wall(5000, 2500, 0, List.of(wallOpening1));
 
             Opening opening2 = new Opening(OpeningType.DOOR, 1000, 2000);
             WallOpening wallOpening2 = new WallOpening(opening2, 3000, 0);
@@ -89,7 +89,7 @@ class WallTest {
 
         @Test
         void shouldThrowIllegalArgumentExceptionIfNewOpeningExceedsWallLength() {
-            Wall wall = new Wall(5000);
+            Wall wall = new Wall(5000, 2500, 0);
             Opening opening = new Opening(OpeningType.WINDOW, 3000, 1000);
             WallOpening wallOpening = new WallOpening(opening, 2100, 0); // 2100 + 3000 = 5100 > 5000
 
@@ -100,14 +100,14 @@ class WallTest {
 
         @Test
         void shouldThrowNpeIfNewOpeningIsNull() {
-            Wall wall = new Wall(5000);
+            Wall wall = new Wall(5000, 2500, 0);
             assertThatThrownBy(() -> wall.withOpening(null))
                     .isInstanceOf(NullPointerException.class);
         }
 
         @Test
         void shouldChainMultipleWithOpeningCalls() {
-            Wall wall = new Wall(10000);
+            Wall wall = new Wall(10000, 2500, 0);
             Opening opening1 = new Opening(OpeningType.WINDOW, 1000, 1000);
             WallOpening wallOpening1 = new WallOpening(opening1, 1000, 0);
             Opening opening2 = new Opening(OpeningType.DOOR, 2000, 2000);
@@ -157,7 +157,7 @@ class WallTest {
             Opening opening2 = new Opening(OpeningType.DOOR, 900, 2000); // area = 1800000
             WallOpening wallOpening1 = new WallOpening(opening1, 1000, 0);
             WallOpening wallOpening2 = new WallOpening(opening2, 3000, 0);
-            Wall wall = new Wall(5000, List.of(wallOpening1, wallOpening2));
+            Wall wall = new Wall(5000, 2500, 0, List.of(wallOpening1, wallOpening2));
 
             double totalArea = wall.totalOpeningsArea();
 
@@ -170,7 +170,7 @@ class WallTest {
             Opening opening2 = new Opening(OpeningType.DOOR, 900, 2000); // area = 1800000
             WallOpening wallOpening1 = new WallOpening(opening1, 1000, 0);
             WallOpening wallOpening2 = new WallOpening(opening2, 3000, 0);
-            Wall wall = new Wall(5000, List.of(wallOpening1, wallOpening2)); // totalOpeningsArea = 3600000
+            Wall wall = new Wall(5000, 2500, 0, List.of(wallOpening1, wallOpening2)); // totalOpeningsArea = 3600000
             // gross area = 5000 * 2500 = 12500000
 
             double netArea = wall.netArea();
@@ -189,8 +189,8 @@ class WallTest {
             Opening opening2 = new Opening(OpeningType.DOOR, 1000, 2000);
             WallOpening wallOpening2 = new WallOpening(opening2, 3000, 0);
 
-            Wall wall1 = new Wall(5000, List.of(wallOpening1, wallOpening2));
-            Wall wall2 = new Wall(5000, List.of(wallOpening1, wallOpening2));
+            Wall wall1 = new Wall(5000, 2500, 0, List.of(wallOpening1, wallOpening2));
+            Wall wall2 = new Wall(5000, 2500, 1, List.of(wallOpening1, wallOpening2));
 
             assertThat(wall1).isEqualTo(wall2);
             assertThat(wall1.hashCode()).isEqualTo(wall2.hashCode());
@@ -198,9 +198,9 @@ class WallTest {
 
         @Test
         void unequalWallsShouldNotBeEqual() {
-            Wall wall1 = new Wall(5000, List.of());
-            Wall wall2 = new Wall(6000, List.of());
-            Wall wall3 = new Wall(5000, List.of(new WallOpening(new Opening(OpeningType.WINDOW, 1000, 1000), 1000, 0)));
+            Wall wall1 = new Wall(5000, 2500, 0, List.of());
+            Wall wall2 = new Wall(6000, 2500, 1, List.of());
+            Wall wall3 = new Wall(5000, 2500, 2, List.of(new WallOpening(new Opening(OpeningType.WINDOW, 1000, 1000), 1000, 0)));
 
             assertThat(wall1).isNotEqualTo(wall2);
             assertThat(wall1).isNotEqualTo(wall3);

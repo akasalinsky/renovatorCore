@@ -1,19 +1,24 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 
 public class Opening {
 
-    private OpeningType type;
-    private int width;
-    private int height;
+    private final OpeningType type;
+    private final int width;
+    private final int height;
 
 
-    public Opening(OpeningType type, int width, int height) {
+    public Opening(
+            @JsonProperty("type") OpeningType type,
+            @JsonProperty("width") int width,
+            @JsonProperty("height") int height) {
         if (width < 0 || height < 0) {
             throw new IllegalArgumentException("Openings area cannot be negative");
         }
-
         this.type = type;
         this.width = width;
         this.height = height;
@@ -31,6 +36,7 @@ public class Opening {
         return height;
     }
 
+    @JsonIgnore
     public int getArea() {
         return width * height;
     }

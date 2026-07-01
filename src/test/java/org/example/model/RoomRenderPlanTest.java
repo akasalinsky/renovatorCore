@@ -24,10 +24,10 @@ class RoomRenderPlanTest {
         void shouldRenderSimpleRectangle() {
             // given
             List<Wall> walls = List.of(
-                    new Wall(4000, List.of()),
-                    new Wall(3000, List.of()),
-                    new Wall(4000, List.of()),
-                    new Wall(3000, List.of())
+                    new Wall(4000, 2700, 0, List.of()),
+                    new Wall(3000, 2700, 1, List.of()),
+                    new Wall(4000, 2700, 2, List.of()),
+                    new Wall(3000, 2700, 3, List.of())
             );
             Room room = new Room("Living Room", 2500, walls, RECTANGULAR_CORNERS);
 
@@ -56,10 +56,10 @@ class RoomRenderPlanTest {
             WallOpening window = new WallOpening(
                     new Opening(OpeningType.WINDOW, 1000, 1500), 1000, 900);
             List<Wall> walls = List.of(
-                    new Wall(4000, List.of(window)),
-                    new Wall(3000, List.of()),
-                    new Wall(4000, List.of()),
-                    new Wall(3000, List.of())
+                    new Wall(4000, 2700, 0, List.of(window)),
+                    new Wall(3000, 2700, 1, List.of()),
+                    new Wall(4000, 2700, 2, List.of()),
+                    new Wall(3000, 2700, 3, List.of())
             );
             Room room = new Room("Bedroom", 2500, walls, RECTANGULAR_CORNERS);
 
@@ -88,10 +88,10 @@ class RoomRenderPlanTest {
             WallOpening door = new WallOpening(
                     new Opening(OpeningType.DOOR, 1000, 2000), 1000, 0);
             List<Wall> walls = List.of(
-                    new Wall(4000, List.of()),
-                    new Wall(3000, List.of(door)),
-                    new Wall(4000, List.of()),
-                    new Wall(3000, List.of())
+                    new Wall(4000, 2700, 0, List.of()),
+                    new Wall(3000, 2700, 1, List.of(door)),
+                    new Wall(4000, 2700, 2, List.of()),
+                    new Wall(3000, 2700, 3, List.of())
             );
             Room room = new Room("Hall", 2500, walls, RECTANGULAR_CORNERS);
 
@@ -127,10 +127,10 @@ class RoomRenderPlanTest {
                     new Opening(OpeningType.WINDOW, 2000, 2000), 1000, 0);
 
             List<Wall> walls = List.of(
-                    new Wall(4000, List.of(northOpening)),
-                    new Wall(3000, List.of(eastOpening)),
-                    new Wall(4000, List.of(southOpening)),
-                    new Wall(3000, List.of(westOpening))
+                    new Wall(4000, 2700, 0, List.of(northOpening)),
+                    new Wall(3000, 2700, 1, List.of(eastOpening)),
+                    new Wall(4000, 2700, 2, List.of(southOpening)),
+                    new Wall(3000, 2700, 3, List.of(westOpening))
             );
             Room room = new Room("Complex Room", 2500, walls, RECTANGULAR_CORNERS);
 
@@ -157,10 +157,10 @@ class RoomRenderPlanTest {
         void shouldScaleOneMeterToOneCharacter() {
             // given
             List<Wall> walls = List.of(
-                    new Wall(2000, List.of()),
-                    new Wall(1000, List.of()),
-                    new Wall(2000, List.of()),
-                    new Wall(1000, List.of())
+                    new Wall(2000, 2700, 0, List.of()),
+                    new Wall(1000, 2700, 1, List.of()),
+                    new Wall(2000, 2700, 2, List.of()),
+                    new Wall(1000, 2700, 3, List.of())
             );
             Room room = new Room("Small Room", 2500, walls, RECTANGULAR_CORNERS);
 

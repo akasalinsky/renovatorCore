@@ -3,8 +3,8 @@ package org.example.model;
 
 public record WallOpening(
         Opening opening,
-        int distanceFromLeft,    // метров от левого края стены до левого края проёма
-        int distanceFromFloor    // метров от пола до нижнего края проёма
+        int distanceFromLeft,
+        int distanceFromFloor
 ) {
     public WallOpening {
         if (distanceFromLeft < 0) throw new IllegalArgumentException("Distance from left must be non-negative");
@@ -12,7 +12,6 @@ public record WallOpening(
         if (opening == null) throw new NullPointerException("opening must not be null");
     }
 
-    // Вычисляемые свойства (удобство)
     public int width() { return opening.getWidth(); }
     public int height() { return opening.getHeight(); }
     public int area() { return opening.getArea(); }

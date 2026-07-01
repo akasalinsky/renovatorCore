@@ -28,8 +28,10 @@ public class MyTelegramBot implements LongPollingSingleThreadUpdateConsumer {
             String text = update.getMessage().getText();
 
             String response = botService.processMessage(chatId, text);
+            //if (response.equals(""))
 
             SendMessage sendMessage = new SendMessage(String.valueOf(chatId), response);
+            if(response.startsWith("<pre>")){sendMessage.setParseMode("HTML");}
 
             try {
                 telegramClient.execute(sendMessage);
