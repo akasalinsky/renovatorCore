@@ -3,10 +3,11 @@ package org.example.bot;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.example.cli.RoomCli;
 import org.example.i18n.MessageProvider;
+import org.example.model.Room;
+import org.example.model.UserProjects;
+import org.example.repository.UserProjectRepository;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class BotService {
 
@@ -15,12 +16,11 @@ public class BotService {
     private static final Locale DEFAULT_LOCALE = Locale.forLanguageTag("ru");
     private final String botToken;
     private final Long chatId;
-    private MessageProvider messageProvider;
+    private final UserProjectRepository repository;
+    private final Map<Long, UserProjects> loadedProjects = new HashMap<>();
 
-
-
-    public BotService() {
-        // Загружаем переменные окружения из файла .env
+    public BotService(UserProjectRepository repository) {
+        this.repository = Objects.requireNonNull(repository, "repository cannot be null");
         Dotenv dotenv = Dotenv.configure().load();
 
         this.botToken = dotenv.get("TELEGRAM_BOT_TOKEN");
@@ -40,15 +40,14 @@ public class BotService {
             throw new IllegalStateException("TELEGRAM_CHAT_ID должен быть числом", e);
         }
     }
+
     public String processMessage(long chatId, String text) {
-        return processMessage(chatId, text, DEFAULT_LOCALE);
-    }
-
-
-    public String processMessage(long chatId, String text, Locale locale) {
-        Dotenv dotenv = Dotenv.configure().load();
-        //Locale locale = userLocales.getOrDefault(chatId, DEFAULT_LOCALE);
-        messageProvider = new MessageProvider(locale);
+        UserProjects projects = loadedProjects.computeIfAbsent(chatId, id -> {
+            return repository.findByChatId(id)
+                    .orElse(new UserProjects(DEFAULT_LOCALE, List.of(), 0));
+        });
+        Locale locale = projects.locale();
+        MessageProvider messageProvider = new MessageProvider(locale);
 
         if (text == null) {
             return messageProvider.get("empty.message");
@@ -66,30 +65,82 @@ public class BotService {
             if (newLocale == null) {
                 return messageProvider.get("lang.unsupported", langCode);
             }
+
+            RoomCli oldCli = userSessions.get(chatId);
+            Room currentRoom = (oldCli != null) ? oldCli.getCurrentRoom() : null;
+
+            RoomCli newCli = new RoomCli(newLocale);
+            if (currentRoom != null) {
+                newCli.setCurrentRoom(currentRoom);
+            }
+
+            userSessions.put(chatId, newCli);
             userLocales.put(chatId, newLocale);
-            // Пересоздаём сессию с новым языком
-            userSessions.remove(chatId);
-            userSessions.put(chatId, new RoomCli(newLocale));
-            messageProvider = new MessageProvider(newLocale);
-            return messageProvider.get("lang.set", newLocale.getDisplayName(newLocale)); // потом из MessageProvider
+
+            UserProjects updateProjects = loadedProjects.get(chatId);
+            if (updateProjects != null) {
+                updateProjects = updateProjects.withLanguage(newLocale);
+                loadedProjects.put(chatId, updateProjects);
+                repository.save(chatId, updateProjects);
+            }
+
+            MessageProvider newMsgProvider = new MessageProvider(newLocale);
+            return newMsgProvider.get("lang.set", newLocale.getDisplayName(newLocale));
         }
 
-        // Check for welcome commands
         if ("/start".equalsIgnoreCase(trimmedText) || "hello".equalsIgnoreCase(trimmedText)) {
             return messageProvider.get("start.welcome");
         }
 
-        // Check for exit command
         if ("exit".equalsIgnoreCase(trimmedText)) {
             userSessions.remove(chatId);
+            loadedProjects.remove(chatId);
             return messageProvider.get("goodbye");
         }
 
-        // Get or create RoomCli instance for the user
-        RoomCli cli = userSessions.computeIfAbsent(chatId, k -> new RoomCli(locale));
+        RoomCli cli = userSessions.computeIfAbsent(chatId, k -> {
+            RoomCli newCli = new RoomCli(locale);
+            if (!projects.rooms().isEmpty()) {
+                Room activeRoom = projects.rooms().get(projects.activeRoomIndex());
+                newCli.setCurrentRoom(activeRoom);
+            }
+            return newCli;
+        });
 
-        // Process the command using the user's RoomCli instance
-        return cli.execute(trimmedText);
+        Room oldRoom = cli.getCurrentRoom();
+
+        String response = cli.execute(text);
+
+        syncRoomToProjects(chatId, cli, projects, text);
+
+        return response;
+    }
+
+    private void syncRoomToProjects(long chatId, RoomCli cli, UserProjects projects, String command) {
+        Room currentRoom = cli.getCurrentRoom();
+
+        if (command.startsWith("create ") || command.startsWith("создать ")) {
+            List<Room> rooms = new ArrayList<>(projects.rooms());
+            rooms.add(currentRoom);
+            projects = projects.withRooms(rooms);
+            projects = projects.withActiveRoomIndex(rooms.size() - 1);
+        }
+        else if (command.startsWith("opening ") || command.startsWith("проем ")) {
+            List<Room> rooms = new ArrayList<>(projects.rooms());
+            int activeIndex = projects.activeRoomIndex();
+            if (activeIndex < rooms.size()) {
+                rooms.set(activeIndex, currentRoom);
+                projects = projects.withRooms(rooms);
+            }
+        }
+        else if (command.startsWith("/lang ")) {
+            String langCode = command.substring(6).trim();
+            Locale newLocale = Locale.forLanguageTag(langCode);
+            projects = projects.withLanguage(newLocale);
+        }
+
+        loadedProjects.put(chatId, projects);
+        repository.save(chatId, projects);
     }
 
     public String getBotToken() {

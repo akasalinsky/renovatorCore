@@ -62,7 +62,7 @@ class WallOpeningTest {
             Opening opening = new Opening(OpeningType.WINDOW, 1500, 2000);
             WallOpening wallOpening = new WallOpening(opening, 1000, 500);
 
-            assertThat(wallOpening.width()).isEqualTo(opening.getWidth());
+            assertThat(wallOpening.width()).isEqualTo(opening.width());
         }
 
         @Test
@@ -70,7 +70,7 @@ class WallOpeningTest {
             Opening opening = new Opening(OpeningType.WINDOW, 1500, 2000);
             WallOpening wallOpening = new WallOpening(opening, 1000, 500);
 
-            assertThat(wallOpening.height()).isEqualTo(opening.getHeight());
+            assertThat(wallOpening.height()).isEqualTo(opening.height());
         }
 
         @Test

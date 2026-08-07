@@ -47,9 +47,9 @@ class UserProjectsTest {
     void shouldCreateWithValidData() {
         UserProjects projects = new UserProjects(Locale.forLanguageTag("ru"), rooms, 1);
 
-        assertThat(projects.getLanguage()).isEqualTo(Locale.forLanguageTag("ru"));
-        assertThat(projects.getRooms()).containsExactlyElementsOf(rooms);
-        assertThat(projects.getActiveRoomIndex()).isEqualTo(1);
+        assertThat(projects.locale()).isEqualTo(Locale.forLanguageTag("ru"));
+        assertThat(projects.rooms()).containsExactlyElementsOf(rooms);
+        assertThat(projects.activeRoomIndex()).isEqualTo(1);
     }
 
     @Test
@@ -78,8 +78,8 @@ class UserProjectsTest {
         // Передаем индекс 99, но список пуст. Ожидаем, что исключений не будет, а индекс станет 0.
         UserProjects projects = new UserProjects(Locale.ENGLISH, List.of(), 99);
 
-        assertThat(projects.getRooms()).isEmpty();
-        assertThat(projects.getActiveRoomIndex()).isZero();
+        assertThat(projects.rooms()).isEmpty();
+        assertThat(projects.activeRoomIndex()).isZero();
     }
 
     @Test
@@ -92,13 +92,13 @@ class UserProjectsTest {
         UserProjects withIndex = original.withActiveRoomIndex(1);
 
         // Проверяем, что оригинал не изменился
-        assertThat(original.getLanguage()).isEqualTo(Locale.ENGLISH);
-        assertThat(original.getActiveRoomIndex()).isZero();
+        assertThat(original.locale()).isEqualTo(Locale.ENGLISH);
+        assertThat(original.activeRoomIndex()).isZero();
 
         // Проверяем новые объекты
-        assertThat(withLanguage.getLanguage()).isEqualTo(Locale.forLanguageTag("ru"));
-        assertThat(withRooms.getRooms()).hasSize(1);
-        assertThat(withIndex.getActiveRoomIndex()).isEqualTo(1);
+        assertThat(withLanguage.locale()).isEqualTo(Locale.forLanguageTag("ru"));
+        assertThat(withRooms.rooms()).hasSize(1);
+        assertThat(withIndex.activeRoomIndex()).isEqualTo(1);
     }
 
     /*@Test
@@ -142,7 +142,7 @@ class FileUserProjectRepositoryTest {
                 new Wall(5000, height, 3)
         );
         List<Integer> angles = List.of(90, 90, 90, 90);
-        repository = new FileUserProjectRepository(tempDir.toString(), chatId1);
+        repository = new FileUserProjectRepository(tempDir.toString());
         projects1 = new UserProjects(Locale.ENGLISH, List.of(new Room("r1", height, walls1, angles)), 0);
         projects2 = new UserProjects(Locale.forLanguageTag("ru"), List.of(new Room("r2", height, walls2, angles)), 0);
     }
@@ -221,6 +221,6 @@ class FileUserProjectRepositoryTest {
 
         UserProjects projects = new UserProjects(russianLocale, validRooms, 0);
 
-        assertThat(projects.getLanguage()).isEqualTo(russianLocale);
+        assertThat(projects.locale()).isEqualTo(russianLocale);
     }
 }

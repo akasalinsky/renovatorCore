@@ -1,4 +1,6 @@
 package org.example.service.money;
 
-public class Currency {
+public enum Currency {
+    USD, RUB
+
 }

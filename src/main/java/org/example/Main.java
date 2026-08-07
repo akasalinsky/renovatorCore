@@ -22,6 +22,5 @@ public class Main {
             System.err.println("Ошибка при запуске бота: " + e.getMessage());
             e.printStackTrace();
         }
-
     }
 }

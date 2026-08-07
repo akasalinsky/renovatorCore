@@ -1,6 +1,5 @@
 package org.example.model;
 
-
 public record WallOpening(
         Opening opening,
         int distanceFromLeft,
@@ -12,7 +11,7 @@ public record WallOpening(
         if (opening == null) throw new NullPointerException("opening must not be null");
     }
 
-    public int width() { return opening.getWidth(); }
-    public int height() { return opening.getHeight(); }
+    public int width() { return opening.width(); }
+    public int height() { return opening.height(); }
     public int area() { return opening.getArea(); }
 }

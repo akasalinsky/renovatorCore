@@ -1,5 +1,8 @@
 package org.example.model;
 
+import org.example.service.RoomCalculationService;
+import org.example.service.RoomRenderingService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Nested;
 import static org.assertj.core.api.Assertions.*;
@@ -9,7 +12,14 @@ import java.util.Arrays;
 import java.util.List;
 
 class RoomTest {
-
+    private RoomCalculationService roomCalculationService;
+    private RoomRenderingService roomRenderingService;
+    @BeforeEach
+    void setUp() {
+        // Вот здесь создаются объекты перед каждым тестом
+        roomRenderingService = new RoomRenderingService();
+        roomCalculationService = new RoomCalculationService();
+    }
     @Nested
     class ConstructorAndGetters {
 
@@ -30,15 +40,15 @@ class RoomTest {
             Room room = new Room(name, height, walls, angles);
 
             // Then
-            assertThat(room.getName()).isEqualTo(name);
-            assertThat(room.getHeight()).isEqualTo(height);
+            assertThat(room.name()).isEqualTo(name);
+            assertThat(room.height()).isEqualTo(height);
 
-            List<Wall> retrievedWalls = room.getWalls();
+            List<Wall> retrievedWalls = room.walls();
             assertThat(retrievedWalls).hasSize(4);
             assertThatThrownBy(() -> retrievedWalls.add(new Wall(1000, 2500, 0)))
                     .isInstanceOf(UnsupportedOperationException.class);
 
-            List<Integer> retrievedAngles = room.getAngles();
+            List<Integer> retrievedAngles = room.angles();
             assertThat(retrievedAngles).hasSize(4).containsExactlyElementsOf(angles);
             assertThatThrownBy(() -> retrievedAngles.add(100))
                     .isInstanceOf(UnsupportedOperationException.class);
@@ -128,7 +138,7 @@ class RoomTest {
             Room room = new Room("Test Room", 2500, walls, angles);
 
             // When
-            int totalArea = room.totalWallArea();
+            int totalArea = roomCalculationService.getTotalWallArea(room);
 
             // Then
             assertThat(totalArea).isEqualTo(35000000); // (3000+4000+3000+4000) * 2500
@@ -152,7 +162,7 @@ class RoomTest {
             Room room = new Room("Test Room", 2500, walls, angles);
 
             // When
-            double totalOpeningsArea = room.totalOpeningsArea();
+            double totalOpeningsArea = roomCalculationService.getTotalOpeningsArea(room);
 
             // Then
             assertThat(totalOpeningsArea).isEqualTo(3600000); // 1800000 + 1800000
@@ -173,7 +183,7 @@ class RoomTest {
             Room room = new Room("Test Room", 2500, walls, angles);
 
             // When
-            double netWallArea = room.netWallArea();
+            double netWallArea = roomCalculationService.getNetWallArea(room);
 
             // Then
             assertThat(netWallArea).isEqualTo(9640000); // totalWallArea=4000000, totalOpeningsArea=360000
@@ -196,7 +206,7 @@ class RoomTest {
             Room room = new Room("Test Room", 1000, walls, angles);
 
             // When
-            String description = room.describe();
+            String description = roomRenderingService.describe(room, roomCalculationService);
 
             // Then
             assertThat(description).contains("1000") // height
@@ -220,7 +230,7 @@ class RoomTest {
         Room updatedRoom = originalRoom.withOpening(1, wallOpening);
 
         List<Wall> list = new ArrayList<>();
-        for(Wall wall: updatedRoom.getWalls()){
+        for(Wall wall: updatedRoom.walls()){
             if(wall.getCounter() == 1) {list.add(wall);}
         }
 

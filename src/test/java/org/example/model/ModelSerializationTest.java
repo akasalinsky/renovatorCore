@@ -53,9 +53,9 @@ class ModelSerializationTest {
 
             Opening opening = mapper.readValue(json, Opening.class);
 
-            assertThat(opening.getType()).isEqualTo(OpeningType.DOOR);
-            assertThat(opening.getWidth()).isEqualTo(900);
-            assertThat(opening.getHeight()).isEqualTo(2100);
+            assertThat(opening.type()).isEqualTo(OpeningType.DOOR);
+            assertThat(opening.width()).isEqualTo(900);
+            assertThat(opening.height()).isEqualTo(2100);
             assertThat(opening.getArea()).isEqualTo(900 * 2100);
         }
 
@@ -225,14 +225,14 @@ class ModelSerializationTest {
             String json = mapper.writeValueAsString(original);
             Room deserialized = mapper.readValue(json, Room.class);
 
-            assertThat(deserialized.getName()).isEqualTo("Kitchen");
-            assertThat(deserialized.getHeight()).isEqualTo(2700);
-            assertThat(deserialized.getWalls()).hasSize(4);
-            assertThat(deserialized.getAngles()).containsExactly(90, 90, 90, 90);
+            assertThat(deserialized.name()).isEqualTo("Kitchen");
+            assertThat(deserialized.height()).isEqualTo(2700);
+            assertThat(deserialized.walls()).hasSize(4);
+            assertThat(deserialized.angles()).containsExactly(90, 90, 90, 90);
 
             // Проверяем, что проем восстановился
-            assertThat(deserialized.getWalls().get(0).getWallOpenings()).hasSize(1);
-            assertThat(deserialized.getWalls().get(0).getWallOpenings().get(0)).isEqualTo(wo);
+            assertThat(deserialized.walls().get(0).getWallOpenings()).hasSize(1);
+            assertThat(deserialized.walls().get(0).getWallOpenings().get(0)).isEqualTo(wo);
         }
     }
 
@@ -303,15 +303,15 @@ class ModelSerializationTest {
             String json = mapper.writeValueAsString(original);
             UserProjects deserialized = mapper.readValue(json, UserProjects.class);
 
-            assertThat(deserialized.getLanguage()).isEqualTo(Locale.forLanguageTag("ru"));
-            assertThat(deserialized.getRooms()).hasSize(1);
-            assertThat(deserialized.getActiveRoomIndex()).isZero();
+            assertThat(deserialized.locale()).isEqualTo(Locale.forLanguageTag("ru"));
+            assertThat(deserialized.rooms()).hasSize(1);
+            assertThat(deserialized.activeRoomIndex()).isZero();
 
-            Room deserializedRoom = deserialized.getRooms().get(0);
-            assertThat(deserializedRoom.getName()).isEqualTo("Kitchen");
-            assertThat(deserializedRoom.getHeight()).isEqualTo(2500);
-            assertThat(deserializedRoom.getWalls()).hasSize(4);
-            assertThat(deserializedRoom.getWalls().get(0).getWallOpenings()).hasSize(1);
+            Room deserializedRoom = deserialized.rooms().get(0);
+            assertThat(deserializedRoom.name()).isEqualTo("Kitchen");
+            assertThat(deserializedRoom.height()).isEqualTo(2500);
+            assertThat(deserializedRoom.walls()).hasSize(4);
+            assertThat(deserializedRoom.walls().get(0).getWallOpenings()).hasSize(1);
         }
     }
 
@@ -367,8 +367,8 @@ class ModelSerializationTest {
             UserProjects enDeserialized = mapper.readValue(enJson, UserProjects.class);
             UserProjects ruDeserialized = mapper.readValue(ruJson, UserProjects.class);
 
-            assertThat(enDeserialized.getLanguage()).isEqualTo(Locale.ENGLISH);
-            assertThat(ruDeserialized.getLanguage()).isEqualTo(Locale.forLanguageTag("ru"));
+            assertThat(enDeserialized.locale()).isEqualTo(Locale.ENGLISH);
+            assertThat(ruDeserialized.locale()).isEqualTo(Locale.forLanguageTag("ru"));
         }
     }
 }

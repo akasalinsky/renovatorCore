@@ -18,9 +18,9 @@ public class OpeningTest {
         Opening opening = new Opening(type, width, height);
 
         // Then
-        assertThat(opening.getType()).isEqualTo(type);
-        assertThat(opening.getWidth()).isEqualTo(width);
-        assertThat(opening.getHeight()).isEqualTo(height);
+        assertThat(opening.type()).isEqualTo(type);
+        assertThat(opening.width()).isEqualTo(width);
+        assertThat(opening.height()).isEqualTo(height);
     }
 
     @Test

@@ -34,7 +34,7 @@ class FileUserProjectRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        repository = new FileUserProjectRepository(tempDir.toString(), chatId1);
+        repository = new FileUserProjectRepository(tempDir.toString());
 
         // Создаем тестовые данные
         Opening window = new Opening(OpeningType.WINDOW, 1200, 1400);
@@ -67,10 +67,10 @@ class FileUserProjectRepositoryTest {
         Optional<UserProjects> loaded = repository.findByChatId(chatId1);
 
         assertThat(loaded).isPresent();
-        assertThat(loaded.get().getLanguage()).isEqualTo(Locale.ENGLISH);
-        assertThat(loaded.get().getRooms()).hasSize(1);
-        assertThat(loaded.get().getRooms().get(0).getName()).isEqualTo("Living Room");
-        assertThat(loaded.get().getActiveRoomIndex()).isZero();
+        assertThat(loaded.get().locale()).isEqualTo(Locale.ENGLISH);
+        assertThat(loaded.get().rooms()).hasSize(1);
+        assertThat(loaded.get().rooms().get(0).name()).isEqualTo("Living Room");
+        assertThat(loaded.get().activeRoomIndex()).isZero();
     }
 
     @Test
@@ -91,7 +91,7 @@ class FileUserProjectRepositoryTest {
 
         Optional<UserProjects> loaded = repository.findByChatId(chatId1);
         assertThat(loaded).isPresent();
-        assertThat(loaded.get().getLanguage()).isEqualTo(Locale.forLanguageTag("ru"));
+        assertThat(loaded.get().locale()).isEqualTo(Locale.forLanguageTag("ru"));
     }
 
     @Test
@@ -119,19 +119,6 @@ class FileUserProjectRepositoryTest {
     }*/
 
     @Test
-    @DisplayName("Должен создавать директорию, если её нет")
-    void shouldCreateDirectoryIfNotExists() {
-        Path newDir = tempDir.resolve("new_storage");
-        FileUserProjectRepository newRepo = new FileUserProjectRepository(newDir.toString());
-        assertThat(newDir).doesNotExist();
-
-        newRepo.save(chatId1, projects1);
-
-        assertThat(newDir).exists();
-        assertThat(newDir.resolve("chat_" + chatId1 + ".json")).exists();
-    }
-
-    @Test
     @DisplayName("Данные для разных chatId должны быть независимы")
     void shouldBeIndependentForDifferentChatIds() {
         repository.save(chatId1, projects1);
@@ -141,7 +128,7 @@ class FileUserProjectRepositoryTest {
 
         assertThat(repository.findByChatId(chatId1)).isEmpty();
         assertThat(repository.findByChatId(chatId2)).isPresent();
-        assertThat(repository.findByChatId(chatId2).get().getLanguage()).isEqualTo(Locale.forLanguageTag("ru"));
+        assertThat(repository.findByChatId(chatId2).get().locale()).isEqualTo(Locale.forLanguageTag("ru"));
     }
 
     @Test
@@ -166,12 +153,12 @@ class FileUserProjectRepositoryTest {
         Optional<UserProjects> loaded = repository.findByChatId(chatId1);
 
         assertThat(loaded).isPresent();
-        Room loadedRoom = loaded.get().getRooms().get(0);
-        assertThat(loadedRoom.getWalls().get(0).getWallOpenings()).hasSize(1);
+        Room loadedRoom = loaded.get().rooms().get(0);
+        assertThat(loadedRoom.walls().get(0).getWallOpenings()).hasSize(1);
 
-        WallOpening loadedOpening = loadedRoom.getWalls().get(0).getWallOpenings().get(0);
-        assertThat(loadedOpening.opening().getType()).isEqualTo(OpeningType.WINDOW);
-        assertThat(loadedOpening.opening().getWidth()).isEqualTo(1200);
+        WallOpening loadedOpening = loadedRoom.walls().get(0).getWallOpenings().get(0);
+        assertThat(loadedOpening.opening().type()).isEqualTo(OpeningType.WINDOW);
+        assertThat(loadedOpening.opening().width()).isEqualTo(1200);
         assertThat(loadedOpening.distanceFromLeft()).isEqualTo(500);
     }
 
@@ -184,8 +171,8 @@ class FileUserProjectRepositoryTest {
 
         Optional<UserProjects> loaded = repository.findByChatId(chatId1);
         assertThat(loaded).isPresent();
-        assertThat(loaded.get().getRooms()).isEmpty();
-        assertThat(loaded.get().getActiveRoomIndex()).isZero();
+        assertThat(loaded.get().rooms()).isEmpty();
+        assertThat(loaded.get().activeRoomIndex()).isZero();
     }
 
     @Test

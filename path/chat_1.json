@@ -1,0 +1,255 @@
+{
+  "rooms" : [ {
+    "name" : "Комната",
+    "height" : 2500,
+    "walls" : [ {
+      "length" : 3000,
+      "height" : 2500,
+      "counter" : 0,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 2000,
+      "height" : 2500,
+      "counter" : 1,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 3000,
+      "height" : 2500,
+      "counter" : 2,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 2000,
+      "height" : 2500,
+      "counter" : 3,
+      "wallOpenings" : [ ]
+    } ],
+    "angles" : [ 90, 90, 90, 90 ]
+  }, {
+    "name" : "Кухня",
+    "height" : 2500,
+    "walls" : [ {
+      "length" : 3000,
+      "height" : 2500,
+      "counter" : 0,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 2000,
+      "height" : 2500,
+      "counter" : 1,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 3000,
+      "height" : 2500,
+      "counter" : 2,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 2000,
+      "height" : 2500,
+      "counter" : 3,
+      "wallOpenings" : [ ]
+    } ],
+    "angles" : [ 90, 90, 90, 90 ]
+  }, {
+    "name" : "Комната",
+    "height" : 2500,
+    "walls" : [ {
+      "length" : 3000,
+      "height" : 2500,
+      "counter" : 0,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 2000,
+      "height" : 2500,
+      "counter" : 1,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 3000,
+      "height" : 2500,
+      "counter" : 2,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 2000,
+      "height" : 2500,
+      "counter" : 3,
+      "wallOpenings" : [ ]
+    } ],
+    "angles" : [ 90, 90, 90, 90 ]
+  }, {
+    "name" : "Кухня",
+    "height" : 2500,
+    "walls" : [ {
+      "length" : 3000,
+      "height" : 2500,
+      "counter" : 0,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 2000,
+      "height" : 2500,
+      "counter" : 1,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 3000,
+      "height" : 2500,
+      "counter" : 2,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 2000,
+      "height" : 2500,
+      "counter" : 3,
+      "wallOpenings" : [ ]
+    } ],
+    "angles" : [ 90, 90, 90, 90 ]
+  }, {
+    "name" : "Комната",
+    "height" : 2700,
+    "walls" : [ {
+      "length" : 4000,
+      "height" : 2700,
+      "counter" : 0,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 3000,
+      "height" : 2700,
+      "counter" : 1,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 4000,
+      "height" : 2700,
+      "counter" : 2,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 3000,
+      "height" : 2700,
+      "counter" : 3,
+      "wallOpenings" : [ ]
+    } ],
+    "angles" : [ 90, 90, 90, 90 ]
+  }, {
+    "name" : "Комната",
+    "height" : 2700,
+    "walls" : [ {
+      "length" : 4000,
+      "height" : 2700,
+      "counter" : 0,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 3000,
+      "height" : 2700,
+      "counter" : 1,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 4000,
+      "height" : 2700,
+      "counter" : 2,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 3000,
+      "height" : 2700,
+      "counter" : 3,
+      "wallOpenings" : [ ]
+    } ],
+    "angles" : [ 90, 90, 90, 90 ]
+  }, {
+    "name" : "Комната",
+    "height" : 2700,
+    "walls" : [ {
+      "length" : 4000,
+      "height" : 2700,
+      "counter" : 0,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 3000,
+      "height" : 2700,
+      "counter" : 1,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 4000,
+      "height" : 2700,
+      "counter" : 2,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 3000,
+      "height" : 2700,
+      "counter" : 3,
+      "wallOpenings" : [ ]
+    } ],
+    "angles" : [ 90, 90, 90, 90 ]
+  }, {
+    "name" : "Комната",
+    "height" : 2500,
+    "walls" : [ {
+      "length" : 3000,
+      "height" : 2500,
+      "counter" : 0,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 2000,
+      "height" : 2500,
+      "counter" : 1,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 3000,
+      "height" : 2500,
+      "counter" : 2,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 2000,
+      "height" : 2500,
+      "counter" : 3,
+      "wallOpenings" : [ ]
+    } ],
+    "angles" : [ 90, 90, 90, 90 ]
+  }, {
+    "name" : "Кухня",
+    "height" : 2500,
+    "walls" : [ {
+      "length" : 3000,
+      "height" : 2500,
+      "counter" : 0,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 2000,
+      "height" : 2500,
+      "counter" : 1,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 3000,
+      "height" : 2500,
+      "counter" : 2,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 2000,
+      "height" : 2500,
+      "counter" : 3,
+      "wallOpenings" : [ ]
+    } ],
+    "angles" : [ 90, 90, 90, 90 ]
+  }, {
+    "name" : "Комната",
+    "height" : 2700,
+    "walls" : [ {
+      "length" : 4000,
+      "height" : 2700,
+      "counter" : 0,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 3000,
+      "height" : 2700,
+      "counter" : 1,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 4000,
+      "height" : 2700,
+      "counter" : 2,
+      "wallOpenings" : [ ]
+    }, {
+      "length" : 3000,
+      "height" : 2700,
+      "counter" : 3,
+      "wallOpenings" : [ ]
+    } ],
+    "angles" : [ 90, 90, 90, 90 ]
+  } ],
+  "activeRoomIndex" : 9,
+  "language" : "ru"
+}

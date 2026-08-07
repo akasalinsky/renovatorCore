@@ -3,6 +3,8 @@ package org.example;
 import org.example.bot.BotService;
 import org.example.cli.RoomCli;
 import org.example.i18n.MessageProvider;
+import org.example.repository.FileUserProjectRepository;
+import org.example.repository.UserProjectRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,12 +22,31 @@ public class InternationalizationTest {
         private BotService botService;
         private MessageProvider en;
         private MessageProvider ru;
+        private UserProjectRepository repository;
+
 
         @BeforeEach
         void setUp() {
-            botService = new BotService();
+            this.repository = new FileUserProjectRepository("path");
+            botService = new BotService(repository);
             en = new MessageProvider(Locale.ENGLISH);
             ru = new MessageProvider(Locale.forLanguageTag("ru"));
+        }
+
+        @Test
+        void afterLanguageChange_roomShouldBePreserved() {
+            long chatId = 1L;
+
+            botService.processMessage(chatId, "create Комната 4000 3000 2700");
+
+            String descBefore = botService.processMessage(chatId, "describe");
+            assertThat(descBefore).contains("Комната");
+
+            String langResponse = botService.processMessage(chatId, "/lang en");
+            assertThat(langResponse).isEqualTo(en.get("lang.set", "English"));
+
+            String descAfter = botService.processMessage(chatId, "describe");
+            assertThat(descAfter).contains("Комната");
         }
 
         @Test
@@ -45,7 +66,7 @@ public class InternationalizationTest {
         @Test
         void exitCommand_shouldReturnGoodbyeInDefaultLanguage() {
             long chatId = 1L;
-            String response = botService.processMessage(chatId, "exit", Locale.US);
+            String response = botService.processMessage(chatId, "exit");
             assertThat(response).isEqualTo(en.get("goodbye"));
         }
 
@@ -115,7 +136,7 @@ public class InternationalizationTest {
         @Test
         void nullMessage_shouldReturnEmptyMessageInDefaultLanguage() {
             long chatId = 1L;
-            String response = botService.processMessage(chatId, null, Locale.US);
+            String response = botService.processMessage(chatId, null);
             assertThat(response).isEqualTo(en.get("empty.message"));
         }
     }

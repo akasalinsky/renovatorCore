@@ -6,7 +6,7 @@ import org.example.model.UserProjects;
 import java.util.Optional;
 
 public interface UserProjectRepository {
-    void save(Long chatId, UserProjects userProjects);
+    void save(long chatId, UserProjects userProjects);
     Optional<UserProjects> findByChatId(long chatId);
     void delete(long chatId1);
 }

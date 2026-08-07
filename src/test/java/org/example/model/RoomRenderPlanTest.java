@@ -1,5 +1,6 @@
 package org.example.model;
 
+import org.example.service.RoomRenderingService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ class RoomRenderPlanTest {
     private static final int RIGHT_ANGLE = 90;
     private static final List<Integer> RECTANGULAR_CORNERS =
             List.of(RIGHT_ANGLE, RIGHT_ANGLE, RIGHT_ANGLE, RIGHT_ANGLE);
+    private RoomRenderingService roomRenderingService;
 
     @Nested
     @DisplayName("1. Simple rectangular room without openings")
@@ -32,7 +34,7 @@ class RoomRenderPlanTest {
             Room room = new Room("Living Room", 2500, walls, RECTANGULAR_CORNERS);
 
             // when
-            String plan = room.renderPlan();
+            String plan = roomRenderingService.renderPlan(room);
 
             // then
             String expected =
@@ -64,7 +66,7 @@ class RoomRenderPlanTest {
             Room room = new Room("Bedroom", 2500, walls, RECTANGULAR_CORNERS);
 
             // when
-            String plan = room.renderPlan();
+            String plan = roomRenderingService.renderPlan(room);
 
             // then
             String expected =
@@ -96,7 +98,7 @@ class RoomRenderPlanTest {
             Room room = new Room("Hall", 2500, walls, RECTANGULAR_CORNERS);
 
             // when
-            String plan = room.renderPlan();
+            String plan = roomRenderingService.renderPlan(room);
 
             // then
             String expected =
@@ -135,7 +137,7 @@ class RoomRenderPlanTest {
             Room room = new Room("Complex Room", 2500, walls, RECTANGULAR_CORNERS);
 
             // when
-            String plan = room.renderPlan();
+            String plan = roomRenderingService.renderPlan(room);
 
             // then
             String expected =
@@ -165,7 +167,7 @@ class RoomRenderPlanTest {
             Room room = new Room("Small Room", 2500, walls, RECTANGULAR_CORNERS);
 
             // when
-            String plan = room.renderPlan();
+            String plan = roomRenderingService.renderPlan(room);
 
             // then
             String expected =
